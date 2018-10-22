@@ -1,0 +1,82 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+apply from: '../gradle/common.gradle'
+
+android {
+    compileSdkVersion versions.compileSdk
+    defaultConfig {
+        applicationId "com.victorrendina.mvi.sample"
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.targetSdk
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "com.victorrendina.mvi.sample.SampleTestRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+        test {
+            java.srcDirs += 'src/test/kotlin'
+            java.srcDirs += 'src/testShared/kotlin'
+        }
+        androidTest {
+            java.srcDirs += 'src/androidTest/kotlin'
+            java.srcDirs += 'src/testShared/kotlin'
+        }
+    }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+}
+
+androidExtensions {
+    experimental = true
+}
+
+dependencies {
+    implementation project(':mvi')
+
+    implementation deps.androidx.appCompat
+    implementation deps.androidx.constraintLayout
+    implementation deps.androidx.recyclerView
+
+    implementation deps.dagger.android
+    implementation deps.dagger.androidSupport
+
+    kapt deps.dagger.compiler
+    kapt deps.dagger.androidProcessor
+
+    implementation deps.rx.java
+    implementation deps.rx.android
+    implementation deps.rx.kotlin
+
+    implementation deps.androidx.lifecycle.extensions
+    kapt deps.androidx.lifecycle.compiler
+
+    implementation deps.kotlin.coroutines.rx
+
+    debugImplementation deps.leakCanary.op
+    releaseImplementation deps.leakCanary.noop
+
+    testImplementation deps.robolectric.core
+    testImplementation deps.robolectric.shadows
+
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    androidTestImplementation 'com.android.support.test:rules:1.0.2'
+    androidTestImplementation deps.rx.idler
+
+    kaptAndroidTest deps.dagger.compiler
+    kaptAndroidTest deps.dagger.androidProcessor
+}

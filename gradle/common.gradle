@@ -1,0 +1,41 @@
+/**
+ * Only include dependencies or tasks that are common to Android and Kotlin only modules.
+ */
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+configurations {
+    ktlint
+}
+
+sourceSets {
+    main.java.srcDirs += 'src/main/kotlin'
+    test.java.srcDirs += 'src/test/kotlin'
+}
+
+dependencies {
+    implementation deps.kotlin.stdlib
+    implementation deps.kotlin.reflection
+    implementation deps.kotlin.coroutines.core
+
+    ktlint deps.ktlint
+
+    testImplementation deps.junit
+    testImplementation deps.mockito.core
+    testImplementation deps.mockito.kotlin
+}
+
+task ktlint(type: JavaExec, group: "verification") {
+    description = "Check Kotlin code style."
+    classpath = configurations.ktlint
+    main = "com.github.shyiko.ktlint.Main"
+    args "src/**/*.kt"
+}
+check.dependsOn ktlint
+
+task ktlintFormat(type: JavaExec, group: "formatting") {
+    description = "Fix Kotlin code style deviations."
+    classpath = configurations.ktlint
+    main = "com.github.shyiko.ktlint.Main"
+    args "-F", "src/**/*.kt"
+}

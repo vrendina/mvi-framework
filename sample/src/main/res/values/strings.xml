@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Mvi Playground</string>
+    <string name="entity_name">Entity Name</string>
+    <string name="entity_id">Entity ID</string>
+</resources>
