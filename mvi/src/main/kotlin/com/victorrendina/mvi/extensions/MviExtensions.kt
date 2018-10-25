@@ -17,7 +17,7 @@ import com.victorrendina.mvi.di.MviViewModelFactory
 import com.victorrendina.mvi.di.MviViewModelFactoryOwner
 import kotlin.reflect.KClass
 
-inline fun <T, reified VM : BaseMviViewModel<S, A>, reified S : MviState, reified A : MviArgs> T.fragmentViewModel(
+inline fun <T, reified VM : BaseMviViewModel<S, A>, reified S : MviState, reified A : MviArgs> T.viewModel(
     viewModelClass: KClass<VM> = VM::class
 ) where T: Fragment, T: MviView = LifecycleAwareLazy(this) {
     val arguments: A? = getFragmentArgs()

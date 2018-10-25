@@ -3,7 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
-apply from: '../gradle/common.gradle'
+apply from: rootProject.projectDir.toString() + "/gradle/common.gradle"
 
 android {
     compileSdkVersion versions.compileSdk
@@ -43,7 +43,7 @@ dependencies {
 
     implementation deps.dagger.base
 
-    implementation deps.androidx.lifecycle.extensions
+    api deps.androidx.lifecycle.extensions
     kapt deps.androidx.lifecycle.compiler
     
     testImplementation deps.robolectric.core

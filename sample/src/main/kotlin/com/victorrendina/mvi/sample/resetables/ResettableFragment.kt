@@ -7,7 +7,7 @@ import android.support.v4.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.victorrendina.mvi.extensions.fragmentViewModel
+import com.victorrendina.mvi.extensions.viewModel
 import com.victorrendina.mvi.sample.R
 import com.victorrendina.mvi.sample.framework.BaseFragment
 import com.victorrendina.mvi.views.ThrottledSeekBarListener
@@ -15,7 +15,7 @@ import kotlinx.android.synthetic.main.fragment_resetable.*
 
 class ResettableFragment : BaseFragment() {
 
-    private val viewModel: ResettableViewModel by fragmentViewModel()
+    private val viewModel: ResettableViewModel by viewModel()
 
     private val seekBarChangeListener = ThrottledSeekBarListener(this, interval = 250) {
         viewModel.updateSliderFromUi(it)

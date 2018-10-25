@@ -1,3 +1,4 @@
+rootProject.name = 'mvi-framework'
 include ':sample',
         ':mvi-annotations',
         ':mvi'

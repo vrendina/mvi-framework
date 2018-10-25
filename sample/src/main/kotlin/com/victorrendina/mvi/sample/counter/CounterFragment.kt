@@ -5,14 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.victorrendina.mvi.extensions.activityViewModel
-import com.victorrendina.mvi.extensions.fragmentViewModel
+import com.victorrendina.mvi.extensions.viewModel
 import com.victorrendina.mvi.sample.R
 import com.victorrendina.mvi.sample.framework.BaseFragment
 import kotlinx.android.synthetic.main.fragment_counter.*
 
 class CounterFragment : BaseFragment() {
 
-    private val viewModel: CounterViewModel by fragmentViewModel()
+    private val viewModel: CounterViewModel by viewModel()
     private val sharedViewModel: CounterViewModel by activityViewModel()
 
     /**

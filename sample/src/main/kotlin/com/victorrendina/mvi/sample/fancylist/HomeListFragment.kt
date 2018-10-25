@@ -5,7 +5,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.victorrendina.mvi.extensions.fragmentViewModel
+import com.victorrendina.mvi.extensions.viewModel
 import com.victorrendina.mvi.sample.R
 import com.victorrendina.mvi.sample.framework.BaseFragment
 import com.victorrendina.mvi.withState
@@ -13,7 +13,7 @@ import kotlinx.android.synthetic.main.fragment_sample_list.*
 
 class HomeListFragment : BaseFragment() {
 
-    private val viewModel: HomeListViewModel by fragmentViewModel()
+    private val viewModel: HomeListViewModel by viewModel()
 
     private val adapter by lazy(mode = LazyThreadSafetyMode.NONE) {
         HomeListAdapter(this, viewModel)

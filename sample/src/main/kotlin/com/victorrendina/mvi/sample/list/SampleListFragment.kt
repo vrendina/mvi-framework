@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.victorrendina.mvi.Incomplete
 import com.victorrendina.mvi.Success
-import com.victorrendina.mvi.extensions.fragmentViewModel
+import com.victorrendina.mvi.extensions.viewModel
 import com.victorrendina.mvi.sample.R
 import com.victorrendina.mvi.sample.framework.BaseFragment
 import com.victorrendina.mvi.withState
@@ -17,7 +17,7 @@ import kotlinx.android.synthetic.main.fragment_sample_list.*
 
 class SampleListFragment : BaseFragment() {
 
-    private val viewModel: SampleListViewModel by fragmentViewModel()
+    private val viewModel: SampleListViewModel by viewModel()
 
     private val adapter: SampleListAdapter by lazy(mode = LazyThreadSafetyMode.NONE) {
         Log.d("SampleListFragment", "Created new instance of adapter")
