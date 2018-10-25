@@ -42,7 +42,7 @@ abstract class BaseMviViewModel<S : MviState, A : MviArgs>(
 
             Completable.fromRunnable {
                 validateState()
-            }.subscribeOn(Schedulers.computation()).subscribe().disposeOnClear()
+            }.subscribeOn(Schedulers.computation()).subscribe()
         }
     }
 
@@ -165,7 +165,9 @@ abstract class BaseMviViewModel<S : MviState, A : MviArgs>(
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     fun subscribeMessages(owner: LifecycleOwner, subscriber: (Any) -> Unit) {
-        MviMessageObserver(owner, messageQueue.observeOn(AndroidSchedulers.mainThread()), subscriber).disposeOnClear()
+        MviMessageObserver(owner, messageQueue.observeOn(AndroidSchedulers.mainThread()), subscriber) {
+            disposables.remove(it)
+        }.disposeOnClear()
     }
 
     /**
@@ -325,8 +327,9 @@ abstract class BaseMviViewModel<S : MviState, A : MviArgs>(
 
         val lifecycleAwareObserver = MviLifecycleAwareObserver(
             lifecycleOwner,
-            alwaysDeliverLastValueWhenUnlocked = true,
-            onNext = Consumer<T> { subscriber(it) }
+            alwaysDeliverLastValueWhenUnlocked = false,
+            onNext = Consumer<T> { subscriber(it) },
+            destroyCallback = { disposables.remove(it) }
         )
         return observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(lifecycleAwareObserver)

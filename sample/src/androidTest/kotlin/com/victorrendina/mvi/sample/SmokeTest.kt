@@ -15,7 +15,5 @@ class SmokeTest {
 
     @Test
     fun launch_Activity_Started() {
-
     }
-
 }

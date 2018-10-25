@@ -9,18 +9,13 @@ import com.victorrendina.mvi.extensions.removeItem
 abstract class MviTouchableListAdapter<T, H : MviListViewHolder<T>>(lifecycleOwner: LifecycleOwner) :
     MviListAdapter<T, H>(lifecycleOwner) {
 
-    protected abstract val dragEnabled: Boolean
     protected open val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
-
-    protected abstract val swipeDismissEnabled: Boolean
     protected open val swipeDismissFlags = ItemTouchHelper.START or ItemTouchHelper.END
 
     private val touchHelper by lazy(mode = LazyThreadSafetyMode.NONE) {
         ItemTouchHelper(
             ItemTouchHelperCallback(
                 this,
-                dragEnabled,
-                swipeDismissEnabled,
                 dragFlags,
                 swipeDismissFlags
             )
@@ -38,19 +33,26 @@ abstract class MviTouchableListAdapter<T, H : MviListViewHolder<T>>(lifecycleOwn
     }
 
     fun moveItem(fromIndex: Int, toIndex: Int) {
-        syncMoveToViewModel(fromIndex, toIndex)
         updateDataImmediate(data.moveItem(fromIndex, toIndex), false)
         notifyItemMoved(fromIndex, toIndex)
+        syncMoveToViewModel(fromIndex, toIndex)
     }
 
     fun removeItem(index: Int) {
-        syncSwipeDismissToViewModel(index)
-        updateDataImmediate(data.removeItem(index))
+        updateDataImmediate(data.removeItem(index), false)
         notifyItemRemoved(index)
+        syncSwipeDismissToViewModel(index)
     }
 
-    abstract fun syncMoveToViewModel(fromIndex: Int, toIndex: Int)
+    /**
+     * Override to update the view model whenever an item in the list is moved.
+     */
+    open fun syncMoveToViewModel(fromIndex: Int, toIndex: Int) {
+    }
 
-    abstract fun syncSwipeDismissToViewModel(index: Int)
-
+    /**
+     * Override to update the view model whenever an item in the list is swiped to dismiss.
+     */
+    open fun syncSwipeDismissToViewModel(index: Int) {
+    }
 }

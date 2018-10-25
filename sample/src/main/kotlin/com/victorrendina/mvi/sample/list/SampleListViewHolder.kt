@@ -1,6 +1,5 @@
 package com.victorrendina.mvi.sample.list
 
-import android.arch.lifecycle.LifecycleOwner
 import android.view.View
 import com.victorrendina.mvi.views.MviListViewHolder
 import com.victorrendina.mvi.views.ThrottledSeekBarListener
@@ -8,15 +7,17 @@ import kotlinx.android.synthetic.main.list_item_entity.*
 
 class SampleListViewHolder(
     itemView: View,
-    lifecycleOwner: LifecycleOwner,
     private val viewModel: SampleListViewModel
-) : MviListViewHolder<EntityListItem>(itemView, lifecycleOwner) {
+) : MviListViewHolder<EntityListItem>(itemView) {
 
-    lateinit var currentId: String
+    override val moveEnabled: Boolean = true
+    override val swipeDismissEnabled: Boolean = false
 
     // Delay slider updates by 500 ms
-    private val seekBarChangeListener = ThrottledSeekBarListener(lifecycleOwner, interval = 500) { position ->
-        viewModel.updateSlider(currentId, position)
+    private val seekBarChangeListener = ThrottledSeekBarListener(this, interval = 500) { position ->
+        getCurrentId()?.also {
+            viewModel.updateSlider(it, position)
+        }
     }
 
     init {
@@ -24,15 +25,15 @@ class SampleListViewHolder(
 
         val clickListener = View.OnClickListener {
             checkBox.isChecked = !checkBox.isChecked
-            viewModel.updateToggle(currentId, checkBox.isChecked)
+            getCurrentId()?.also { currentId ->
+                viewModel.updateToggle(currentId, checkBox.isChecked)
+            }
         }
 
         itemView.setOnClickListener(clickListener)
     }
 
     override fun onBind(item: EntityListItem) {
-        currentId = item.entity.id
-
         entityId.text = item.entity.id
         entityName.text = item.entity.name
         checkBox.isChecked = item.selected
@@ -41,5 +42,9 @@ class SampleListViewHolder(
         if (!seekBarChangeListener.interacting) {
             seekBar.progress = item.slider
         }
+    }
+
+    private fun getCurrentId(): String? {
+        return boundItem?.entity?.id
     }
 }

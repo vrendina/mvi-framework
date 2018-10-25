@@ -7,10 +7,9 @@ import javax.inject.Singleton
 @Singleton
 class ProductionEntityRepository @Inject constructor(
     private val localSource: EntityLocalDataSource
-): EntityRepository {
+) : EntityRepository {
 
     override fun getEntities(scope: String): Single<List<Entity>> {
         return localSource.getEntities(scope)
     }
-
 }

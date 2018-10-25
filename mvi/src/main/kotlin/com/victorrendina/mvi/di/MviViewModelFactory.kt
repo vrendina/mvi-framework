@@ -7,8 +7,8 @@ import com.victorrendina.mvi.MviState
 import javax.inject.Inject
 
 class MviViewModelFactory @Inject constructor(
-        private val providers: Map<Class<out ViewModel>, @JvmSuppressWildcards InjectableViewModelFactory<out BaseMviViewModel<*, *>, *, *>>
-)  {
+    private val providers: Map<Class<out ViewModel>, @JvmSuppressWildcards InjectableViewModelFactory<out BaseMviViewModel<*, *>, *, *>>
+) {
 
     fun <VM : BaseMviViewModel<S, A>, S : MviState, A : MviArgs> create(modelClass: Class<VM>, initialState: S, arguments: A?): VM {
         val creator = providers[modelClass]
@@ -21,5 +21,4 @@ class MviViewModelFactory @Inject constructor(
             throw RuntimeException(e)
         }
     }
-
 }

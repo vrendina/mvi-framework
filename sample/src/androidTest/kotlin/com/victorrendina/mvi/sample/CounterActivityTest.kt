@@ -40,7 +40,7 @@ class CounterActivityTest {
 
         sharedTextView.check(matches(withText("34")))
 
-        (0 until  20).forEach {
+        (0 until 20).forEach {
             increaseSharedButton.perform(click())
         }
 
@@ -54,11 +54,10 @@ class CounterActivityTest {
 
         coloredTextView.check(matches(withText("2")))
 
-        (0 until  20).forEach {
+        (0 until 20).forEach {
             decreaseFragmentButton.perform(click())
         }
 
         coloredTextView.check(matches(withText("-18")))
     }
-
 }

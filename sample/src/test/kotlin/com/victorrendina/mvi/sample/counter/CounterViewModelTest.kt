@@ -7,7 +7,7 @@ import com.victorrendina.mvi.withState
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class CounterViewModelTest: BaseAndroidUnitTest() {
+class CounterViewModelTest : BaseAndroidUnitTest() {
 
     private val resourcesMock = mock<Resources>()
 
@@ -28,5 +28,4 @@ class CounterViewModelTest: BaseAndroidUnitTest() {
             assertTrue(it.count == 33)
         }
     }
-
 }

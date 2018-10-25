@@ -4,7 +4,7 @@ import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 
-internal class WorkerMviStateStore<S: MviState>(initialState: S): MviStateStore<S> {
+internal class WorkerMviStateStore<S : MviState>(initialState: S) : MviStateStore<S> {
 
     private val scheduler = Schedulers.newThread()
     private val worker = scheduler.createWorker()

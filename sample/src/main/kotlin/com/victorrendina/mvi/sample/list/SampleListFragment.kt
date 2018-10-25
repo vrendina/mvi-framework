@@ -20,6 +20,7 @@ class SampleListFragment : BaseFragment() {
     private val viewModel: SampleListViewModel by fragmentViewModel()
 
     private val adapter: SampleListAdapter by lazy(mode = LazyThreadSafetyMode.NONE) {
+        Log.d("SampleListFragment", "Created new instance of adapter")
         SampleListAdapter(this, viewModel)
     }
 
@@ -64,6 +65,18 @@ class SampleListFragment : BaseFragment() {
         stateUpdate.setOnClickListener {
             viewModel.simulateStateUpdate()
         }
+
+        nextFragment.setOnClickListener {
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.container, EmptyFragment())
+                .addToBackStack("Empty fragment")
+                .commit()
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        recyclerView.adapter = null
     }
 
     private fun showMessage(message: String) {

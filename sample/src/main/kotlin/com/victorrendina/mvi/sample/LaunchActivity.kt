@@ -5,6 +5,7 @@ import android.os.Bundle
 import com.victorrendina.mvi.extensions.addArguments
 import com.victorrendina.mvi.sample.counter.CounterActivity
 import com.victorrendina.mvi.sample.counter.CounterArgs
+import com.victorrendina.mvi.sample.fancylist.FancyListActivity
 import com.victorrendina.mvi.sample.framework.BaseActivity
 import com.victorrendina.mvi.sample.list.SampleListActivity
 import com.victorrendina.mvi.sample.resetables.ResettableActivity
@@ -28,6 +29,11 @@ class LaunchActivity : BaseActivity() {
 
         resetableButton.setOnClickListener {
             val intent = Intent(this, ResettableActivity::class.java)
+            startActivity(intent)
+        }
+
+        fancyListButton.setOnClickListener {
+            val intent = Intent(this, FancyListActivity::class.java)
             startActivity(intent)
         }
     }

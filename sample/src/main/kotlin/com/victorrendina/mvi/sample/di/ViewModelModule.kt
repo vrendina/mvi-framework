@@ -7,6 +7,8 @@ import com.victorrendina.mvi.di.InjectableViewModelFactory
 import com.victorrendina.mvi.di.ViewModelKey
 import com.victorrendina.mvi.sample.counter.CounterViewModel
 import com.victorrendina.mvi.sample.counter.CounterViewModelFactory
+import com.victorrendina.mvi.sample.fancylist.HomeListViewModel
+import com.victorrendina.mvi.sample.fancylist.HomeListViewModelFactory
 import com.victorrendina.mvi.sample.list.SampleListViewModel
 import com.victorrendina.mvi.sample.list.SampleListViewModelFactory
 import com.victorrendina.mvi.sample.resetables.ResetableViewModelFactory
@@ -38,4 +40,9 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(ResettableViewModel::class)
     abstract fun resetableFactory(factory: ResetableViewModelFactory): InjectableViewModelFactory<out BaseMviViewModel<*, *>, *, *>
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(HomeListViewModel::class)
+    abstract fun homeListFactory(factory: HomeListViewModelFactory): InjectableViewModelFactory<out BaseMviViewModel<*, *>, *, *>
 }

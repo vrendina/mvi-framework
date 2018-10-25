@@ -13,7 +13,7 @@ import io.reactivex.plugins.RxJavaPlugins
 import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
 
-class SampleTestRunner: AndroidJUnitRunner() {
+class SampleTestRunner : AndroidJUnitRunner() {
     override fun newApplication(cl: ClassLoader?, className: String?, context: Context?): Application {
         return super.newApplication(cl, TestSampleApplication::class.java.name, context)
     }

@@ -11,5 +11,4 @@ class SampleDep @Inject constructor(
     fun sayHello() {
         Log.d(this::class.java.simpleName, "Hello from ${resources.getString(R.string.app_name)}")
     }
-
 }

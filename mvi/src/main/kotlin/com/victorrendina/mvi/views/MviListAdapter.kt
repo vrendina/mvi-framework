@@ -4,6 +4,7 @@ import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.OnLifecycleEvent
+import android.support.annotation.CallSuper
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SimpleItemAnimator
@@ -21,17 +22,11 @@ abstract class MviListAdapter<T, H : MviListViewHolder<T>>(lifecycleOwner: Lifec
         private set
 
     private val subject: Subject<MviDiffRequest> = PublishSubject.create()
-    private var subscription: Disposable? = null
+    private val subscription: Disposable
+
+    private val viewHolders = HashSet<MviListViewHolder<T>>(10)
 
     init {
-        lifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {
-            @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-            fun onDestroy() {
-                lifecycleOwner.lifecycle.removeObserver(this)
-                subscription?.dispose()
-                subscription = null
-            }
-        })
         subscription = subject.switchMap { calculateDiff(it) }
             .observeOn(AndroidSchedulers.mainThread()).subscribe {
                 if (it.oldList === data) {
@@ -39,10 +34,21 @@ abstract class MviListAdapter<T, H : MviListViewHolder<T>>(lifecycleOwner: Lifec
                     it.result.dispatchUpdatesTo(this)
                 }
             }
+
+        lifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {
+            @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+            fun onDestroy() {
+                lifecycleOwner.lifecycle.removeObserver(this)
+                subscription.dispose()
+                destroyViewHolders()
+            }
+        })
     }
 
+    @CallSuper
     override fun onBindViewHolder(holder: H, position: Int) {
         holder.bind(data[position])
+        viewHolders.add(holder)
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
@@ -51,21 +57,35 @@ abstract class MviListAdapter<T, H : MviListViewHolder<T>>(lifecycleOwner: Lifec
         (recyclerView.itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
     }
 
+    @CallSuper
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        destroyViewHolders()
+    }
+
     override fun getItemCount(): Int = data.size
 
+    @CallSuper
     override fun onViewAttachedToWindow(holder: H) {
         super.onViewAttachedToWindow(holder)
         holder.attach()
     }
 
+    @CallSuper
     override fun onViewDetachedFromWindow(holder: H) {
         super.onViewDetachedFromWindow(holder)
         holder.detach()
     }
 
+    @CallSuper
     override fun onViewRecycled(holder: H) {
         super.onViewRecycled(holder)
         holder.recycle()
+    }
+
+    private fun destroyViewHolders() {
+        viewHolders.forEach { it.destroy() }
+        viewHolders.clear()
     }
 
     /**

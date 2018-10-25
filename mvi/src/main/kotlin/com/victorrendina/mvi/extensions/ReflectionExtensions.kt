@@ -34,6 +34,5 @@ fun isAssignableTo(from: Class<*>, to: Class<*>): Boolean {
     } else false
 }
 
-
 @Suppress("UNCHECKED_CAST")
 internal fun <T : Any> KClass<T>.copyMethod(): KFunction<T> = this.memberFunctions.first { it.name == "copy" } as KFunction<T>

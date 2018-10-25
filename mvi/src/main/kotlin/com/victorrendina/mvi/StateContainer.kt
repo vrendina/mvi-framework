@@ -12,7 +12,7 @@ fun <VM : BaseMviViewModel<S, *>, S : MviState, R> withState(viewModel: VM, bloc
 fun <VM1 : BaseMviViewModel<S1, *>, S1 : MviState,
     VM2 : BaseMviViewModel<S2, *>, S2 : MviState,
     R> withState(
-    viewModel1: VM1,
-    viewModel2: VM2,
-    block: (S1, S2) -> R
-) = block(viewModel1.state, viewModel2.state)
+        viewModel1: VM1,
+        viewModel2: VM2,
+        block: (S1, S2) -> R
+    ) = block(viewModel1.state, viewModel2.state)

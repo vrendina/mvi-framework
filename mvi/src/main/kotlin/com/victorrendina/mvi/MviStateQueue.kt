@@ -1,7 +1,6 @@
 package com.victorrendina.mvi
 
-import java.util.*
-
+import java.util.LinkedList
 
 internal class MviStateQueue<S : MviState> {
 
@@ -10,12 +9,12 @@ internal class MviStateQueue<S : MviState> {
 
     @Synchronized
     fun enqueueGetStateBlock(block: (state: S) -> Unit) {
-        getStateQueue.push(block)
+        getStateQueue.add(block)
     }
 
     @Synchronized
     fun enqueueSetStateBlock(block: S.() -> S) {
-        setStateQueue.push(block)
+        setStateQueue.add(block)
     }
 
     @Synchronized
@@ -34,5 +33,4 @@ internal class MviStateQueue<S : MviState> {
         setStateQueue = LinkedList()
         return queue
     }
-
 }

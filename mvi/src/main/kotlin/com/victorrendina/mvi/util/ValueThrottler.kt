@@ -12,7 +12,7 @@ open class ValueThrottler<T>(
     unit: TimeUnit = TimeUnit.MILLISECONDS,
     scheduler: Scheduler = AndroidSchedulers.mainThread(),
     listener: (T) -> Unit
-): Disposable {
+) : Disposable {
 
     private val values: Subject<T> = PublishSubject.create<T>().toSerialized()
     private val subscription: Disposable
@@ -37,5 +37,4 @@ open class ValueThrottler<T>(
     override fun dispose() {
         subscription.dispose()
     }
-
 }

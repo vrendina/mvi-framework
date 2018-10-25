@@ -14,7 +14,7 @@ class ProductionEntityRepositoryTest {
     private val testEntity = Entity("testId", "test")
 
     private val localDataSource = mock<EntityLocalDataSource> {
-        on { getEntities(anyString(), anyInt())} doReturn Single.just(listOf(testEntity))
+        on { getEntities(anyString(), anyInt()) } doReturn Single.just(listOf(testEntity))
     }
 
     private val repository = ProductionEntityRepository(localDataSource)
@@ -31,5 +31,4 @@ class ProductionEntityRepositoryTest {
         repository.getEntities("someScope").test()
             .assertValue { it[0] == testEntity }
     }
-
 }

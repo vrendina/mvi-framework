@@ -13,7 +13,7 @@ class ValueRepeater<T>(
     private val unit: TimeUnit = TimeUnit.MILLISECONDS,
     private val scheduler: Scheduler = AndroidSchedulers.mainThread(),
     private val listener: (value: T, count: Long) -> Unit
-): Disposable {
+) : Disposable {
 
     private var subscription: Disposable? = null
     private val disposed = AtomicBoolean(false)
@@ -40,5 +40,4 @@ class ValueRepeater<T>(
         disposed.set(true)
         stopEmissions()
     }
-
 }

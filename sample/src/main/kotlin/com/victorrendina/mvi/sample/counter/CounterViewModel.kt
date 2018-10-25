@@ -42,7 +42,6 @@ class CounterViewModel(
         withState {
             Log.d(tag, "The current count is ${it.count}")
         }
-
     }
 
     fun decreaseCount() {
@@ -51,5 +50,4 @@ class CounterViewModel(
             copy(count = count - 1)
         }
     }
-
 }

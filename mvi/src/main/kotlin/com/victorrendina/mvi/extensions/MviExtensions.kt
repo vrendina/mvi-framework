@@ -17,7 +17,7 @@ import com.victorrendina.mvi.di.MviViewModelFactory
 import com.victorrendina.mvi.di.MviViewModelFactoryOwner
 import kotlin.reflect.KClass
 
-inline fun <T, reified VM : BaseMviViewModel<S, A>, reified S : MviState, reified A: MviArgs> T.fragmentViewModel(
+inline fun <T, reified VM : BaseMviViewModel<S, A>, reified S : MviState, reified A : MviArgs> T.fragmentViewModel(
     viewModelClass: KClass<VM> = VM::class
 ) where T: Fragment, T: MviView = LifecycleAwareLazy(this) {
     val arguments: A? = getFragmentArgs()
@@ -29,7 +29,7 @@ inline fun <T, reified VM : BaseMviViewModel<S, A>, reified S : MviState, reifie
     ViewModelProviders.of(this, factory).get(viewModelClass.java)
 }
 
-inline fun <T, reified VM : BaseMviViewModel<S, A>, reified S : MviState, reified A: MviArgs> T.activityViewModel(
+inline fun <T, reified VM : BaseMviViewModel<S, A>, reified S : MviState, reified A : MviArgs> T.activityViewModel(
     viewModelClass: KClass<VM> = VM::class
 ) where T: Fragment, T: MviView = LifecycleAwareLazy(this) {
     val arguments: A? = getActivityArgs()
@@ -41,7 +41,7 @@ inline fun <T, reified VM : BaseMviViewModel<S, A>, reified S : MviState, reifie
     ViewModelProviders.of(requireActivity(), factory).get(viewModelClass.java)
 }
 
-inline fun <T, reified VM : BaseMviViewModel<S, A>, reified S : MviState, reified A: MviArgs> T.viewModel(
+inline fun <T, reified VM : BaseMviViewModel<S, A>, reified S : MviState, reified A : MviArgs> T.viewModel(
     viewModelClass: KClass<VM> = VM::class
 ) where T: FragmentActivity, T: MviViewModelFactoryOwner, T: MviView =
     LifecycleAwareLazy(this) {
@@ -60,13 +60,13 @@ inline fun <reified A : MviArgs> Fragment.getActivityArgs(): A? {
     return requireActivity().intent?.extras?.get(Mvi.KEY_ARG) as? A
 }
 
-inline fun <reified A: MviArgs> Activity.getArgs(): A? {
+inline fun <reified A : MviArgs> Activity.getArgs(): A? {
     return intent?.extras?.get(Mvi.KEY_ARG) as? A
 }
 
 fun Fragment.getViewModelFactory(): MviViewModelFactory {
-    return (requireActivity() as? MviViewModelFactoryOwner)?.viewModelFactory ?:
-    throw IllegalArgumentException("${this::class.simpleName} must be attached to an activity that is an ${MviViewModelFactoryOwner::class.simpleName}")
+    return (requireActivity() as? MviViewModelFactoryOwner)?.viewModelFactory
+    ?: throw IllegalArgumentException("${this::class.simpleName} must be attached to an activity that is an ${MviViewModelFactoryOwner::class.simpleName}")
 }
 
 fun Intent.addArguments(args: MviArgs): Intent {
@@ -90,7 +90,7 @@ fun Fragment.addArguments(args: MviArgs): Fragment {
  *
  */
 @Suppress("FunctionName")
-inline fun <reified S : MviState, A: MviArgs> _initialStateProvider(args: A?): S {
+inline fun <reified S : MviState, A : MviArgs> _initialStateProvider(args: A?): S {
     val stateClass = S::class.java
     val argsConstructor = args?.let {
         val argType = it::class.java

@@ -6,13 +6,14 @@ import com.victorrendina.mvi.MviArgs
 import com.victorrendina.mvi.MviState
 import com.victorrendina.mvi.Success
 import com.victorrendina.mvi.Uninitialized
-import com.victorrendina.mvi.util.ValueLatch
 import com.victorrendina.mvi.annotations.MviViewModel
 import com.victorrendina.mvi.extensions.moveItem
+import com.victorrendina.mvi.extensions.removeItem
 import com.victorrendina.mvi.extensions.updateItems
 import com.victorrendina.mvi.sample.data.Entity
 import com.victorrendina.mvi.sample.data.EntityRepository
 import com.victorrendina.mvi.sample.framework.BaseViewModel
+import com.victorrendina.mvi.util.ValueLatch
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -135,6 +136,12 @@ class SampleListViewModel(
     fun moveEntity(fromIndex: Int, toIndex: Int) {
         setState {
             copy(entities = entities.moveItem(fromIndex, toIndex))
+        }
+    }
+
+    fun removeEntity(index: Int) {
+        setState {
+            copy(entities = entities.removeItem(index))
         }
     }
 

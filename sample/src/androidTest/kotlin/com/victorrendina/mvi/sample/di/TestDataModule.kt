@@ -6,9 +6,8 @@ import dagger.Binds
 import dagger.Module
 
 @Module
-abstract class TestDataModule: DataModule() {
+abstract class TestDataModule : DataModule() {
 
     @Binds
     abstract fun entitiyRepository(repository: TestEntityRepository): EntityRepository
-
 }

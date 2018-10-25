@@ -16,5 +16,5 @@ import javax.inject.Singleton
 ])
 interface AppComponent : AndroidInjector<MviSampleApplication> {
     @Component.Builder
-    abstract class Builder: AndroidInjector.Builder<MviSampleApplication>()
+    abstract class Builder : AndroidInjector.Builder<MviSampleApplication>()
 }

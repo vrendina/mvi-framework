@@ -4,7 +4,7 @@ import com.victorrendina.mvi.sample.di.DaggerTestAppComponent
 import dagger.android.AndroidInjector
 import dagger.android.support.DaggerApplication
 
-class TestSampleApplication: MviSampleApplication() {
+class TestSampleApplication : MviSampleApplication() {
 
     override fun installLeakCanary() {
     }

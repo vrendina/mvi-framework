@@ -23,7 +23,8 @@ internal class MviLifecycleAwareObserver<T>(
     private var owner: LifecycleOwner?,
     private val activeState: Lifecycle.State = DEFAULT_ACTIVE_STATE,
     private val alwaysDeliverLastValueWhenUnlocked: Boolean = false,
-    private var sourceObserver: Observer<T>?
+    private var sourceObserver: Observer<T>?,
+    private var destroyCallback: ((MviLifecycleAwareObserver<T>) -> Unit)? = null
 ) : AtomicReference<Disposable>(), LifecycleObserver, Observer<T>,
     Disposable {
 
@@ -34,12 +35,14 @@ internal class MviLifecycleAwareObserver<T>(
         onComplete: Action = Functions.EMPTY_ACTION,
         onSubscribe: Consumer<in Disposable> = Functions.emptyConsumer(),
         onError: Consumer<in Throwable> = Functions.ON_ERROR_MISSING,
-        onNext: Consumer<T> = Functions.emptyConsumer()
+        onNext: Consumer<T> = Functions.emptyConsumer(),
+        destroyCallback: ((MviLifecycleAwareObserver<T>) -> Unit)? = null
     ) : this(
         owner,
         activeState,
         alwaysDeliverLastValueWhenUnlocked,
-        LambdaObserver<T>(onNext, onError, onComplete, onSubscribe)
+        LambdaObserver<T>(onNext, onError, onComplete, onSubscribe),
+        destroyCallback
     )
 
     private var lastUndeliveredValue: T? = null
@@ -55,12 +58,10 @@ internal class MviLifecycleAwareObserver<T>(
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun onDestroy() {
-        requireOwner().lifecycle.removeObserver(this)
+        destroyCallback?.invoke(this)
         if (!isDisposed) {
             dispose()
         }
-        owner = null
-        sourceObserver = null
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_ANY)
@@ -96,12 +97,14 @@ internal class MviLifecycleAwareObserver<T>(
         requireSourceObserver().onComplete()
     }
 
-    override fun dispose() {
-        DisposableHelper.dispose(this)
-    }
+    override fun isDisposed(): Boolean = get() === DisposableHelper.DISPOSED
 
-    override fun isDisposed(): Boolean {
-        return get() === DisposableHelper.DISPOSED
+    override fun dispose() {
+        owner?.lifecycle?.removeObserver(this)
+        owner = null
+        sourceObserver = null
+        destroyCallback = null
+        DisposableHelper.dispose(this)
     }
 
     private fun unlock() {

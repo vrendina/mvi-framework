@@ -10,5 +10,4 @@ abstract class DataModule {
 
     @Binds
     abstract fun entitiyRepository(repository: ProductionEntityRepository): EntityRepository
-
 }

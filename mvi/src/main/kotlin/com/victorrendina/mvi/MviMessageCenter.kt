@@ -1,6 +1,4 @@
 package com.victorrendina.mvi
 
 // TODO
-class MviMessageCenter {
-
-}
+class MviMessageCenter

@@ -12,7 +12,9 @@ import java.util.concurrent.atomic.AtomicReference
 internal class MviMessageObserver(
     owner: LifecycleOwner,
     private val observable: Observable<Any>,
-    subscriber: ((Any) -> Unit)
+    subscriber: ((Any) -> Unit),
+    private var destroyCallback: ((MviMessageObserver) -> Unit)? = null
+
 ) : AtomicReference<Disposable>(), LifecycleObserver, Disposable {
 
     private var owner: LifecycleOwner? = owner
@@ -25,6 +27,7 @@ internal class MviMessageObserver(
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun onDestroy() {
+        destroyCallback?.invoke(this)
         if (!isDisposed) {
             dispose()
         }
@@ -60,6 +63,7 @@ internal class MviMessageObserver(
         owner?.lifecycle?.removeObserver(this)
         owner = null
         subscriber = null
+        destroyCallback = null
         innerDispose()
         DisposableHelper.dispose(this)
     }

@@ -15,7 +15,7 @@ open class MviSampleApplication : DaggerApplication() {
         installLeakCanary()
 
         val asyncMainThreadScheduler = AndroidSchedulers.from(Looper.getMainLooper(), true)
-        RxAndroidPlugins.setInitMainThreadSchedulerHandler {asyncMainThreadScheduler }
+        RxAndroidPlugins.setInitMainThreadSchedulerHandler { asyncMainThreadScheduler }
     }
 
     open fun installLeakCanary() {

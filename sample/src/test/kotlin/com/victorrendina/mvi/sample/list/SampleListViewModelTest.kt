@@ -9,12 +9,12 @@ import io.reactivex.Single
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 
-class SampleListViewModelTest: BaseAndroidUnitTest() {
+class SampleListViewModelTest : BaseAndroidUnitTest() {
 
     private val testEntity = Entity("testId", "test")
 
     private val repositoryMock = mock<EntityRepository> {
-        on { getEntities(anyString())} doReturn Single.just(listOf(testEntity))
+        on { getEntities(anyString()) } doReturn Single.just(listOf(testEntity))
     }
 
     private val viewModel = SampleListViewModel(SampleListViewState(), null, repositoryMock)
@@ -22,5 +22,4 @@ class SampleListViewModelTest: BaseAndroidUnitTest() {
     @Test
     fun `Smoke Test`() {
     }
-
 }

@@ -19,6 +19,7 @@
         <activity android:name=".counter.CounterActivity"/>
         <activity android:name=".list.SampleListActivity"/>
         <activity android:name=".resetables.ResettableActivity"/>
+        <activity android:name=".fancylist.FancyListActivity"/>
     </application>
 
 </manifest>

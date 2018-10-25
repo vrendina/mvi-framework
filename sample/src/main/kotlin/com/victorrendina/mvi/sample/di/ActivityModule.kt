@@ -2,6 +2,7 @@ package com.victorrendina.mvi.sample.di
 
 import com.victorrendina.mvi.sample.LaunchActivity
 import com.victorrendina.mvi.sample.counter.CounterActivity
+import com.victorrendina.mvi.sample.fancylist.FancyListActivity
 import com.victorrendina.mvi.sample.list.SampleListActivity
 import com.victorrendina.mvi.sample.resetables.ResettableActivity
 import dagger.Module
@@ -25,4 +26,6 @@ abstract class ActivityModule {
     @ContributesAndroidInjector
     abstract fun resetableActivity(): ResettableActivity
 
+    @ContributesAndroidInjector
+    abstract fun fancyListActivity(): FancyListActivity
 }
