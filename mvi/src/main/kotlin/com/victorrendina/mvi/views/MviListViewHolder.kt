@@ -5,11 +5,12 @@ import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.LifecycleRegistry
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import com.victorrendina.mvi.MviView
 import kotlinx.android.extensions.LayoutContainer
 
 abstract class MviListViewHolder<T>(
     override val containerView: View
-) : RecyclerView.ViewHolder(containerView), LayoutContainer, LifecycleOwner {
+) : RecyclerView.ViewHolder(containerView), LayoutContainer, LifecycleOwner, MviView {
 
     @Suppress("LeakingThis")
     private val lifecycleRegistry = LifecycleRegistry(this)

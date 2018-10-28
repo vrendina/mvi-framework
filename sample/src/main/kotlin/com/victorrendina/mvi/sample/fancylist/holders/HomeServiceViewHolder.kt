@@ -15,7 +15,7 @@ class HomeServiceViewHolder(
     override val moveEnabled: Boolean = true
 
     init {
-        viewModel.selectSubscribe(this, HomeListViewState::editMode) {
+        viewModel.selectSubscribe(HomeListViewState::editMode) {
             Log.d("ViewHolder", "Received edit mode state update: $it")
         }
 
