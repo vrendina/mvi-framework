@@ -60,7 +60,7 @@ abstract class BaseMviViewModel<S : MviState, A : MviArgs>(
     /**
      * Call this to mutate the current state by providing a state reducer. This method is typically invoked by creating
      * a copy of the state class inside the reducer block. The reducer block receives the current state class as the
-     * 'this' value. For example:
+     * `this` value. For example:
      *
      * ```
      * setState {
@@ -132,7 +132,7 @@ abstract class BaseMviViewModel<S : MviState, A : MviArgs>(
 
     /**
      * Access the current ViewModel state. Takes a block of code that will be run after all current pending state
-     * updates are processed. The `this` inside of the block is the state.
+     * updates are processed.
      */
     protected fun withState(block: (state: S) -> Unit) {
         stateStore.get(block)
