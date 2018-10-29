@@ -6,6 +6,8 @@ import android.arch.lifecycle.ViewModel
 import android.support.annotation.CallSuper
 import android.support.annotation.RestrictTo
 import android.util.Log
+import com.victorrendina.mvi.extensions.copyMethod
+import com.victorrendina.mvi.extensions.findParameter
 import com.victorrendina.rxqueue2.QueueSubject
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -16,8 +18,11 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.Subject
+import kotlin.reflect.KParameter
+import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty1
 import kotlin.reflect.KVisibility
+import kotlin.reflect.full.instanceParameter
 
 @SuppressLint("RxSubscribeOnError")
 abstract class BaseMviViewModel<S : MviState, A : MviArgs>(
@@ -35,6 +40,9 @@ abstract class BaseMviViewModel<S : MviState, A : MviArgs>(
     // TODO Need to be able to send messages to multiple listeners
     private val messageQueue: Subject<Any> = QueueSubject.create<Any>().toSerialized()
 
+    private val stateCopyMethod by lazy { initialState::class.copyMethod() }
+    private val stateCopyParamCache = mutableMapOf<KProperty<*>, KParameter>()
+
     init {
         disposables.add(stateStore)
         if (debugMode) {
@@ -50,7 +58,15 @@ abstract class BaseMviViewModel<S : MviState, A : MviArgs>(
         get() = stateStore.state
 
     /**
-     * Call this to mutate the current state.
+     * Call this to mutate the current state by providing a state reducer. This method is typically invoked by creating
+     * a copy of the state class inside the reducer block. The reducer block receives the current state class as the
+     * 'this' value. For example:
+     *
+     * ```
+     * setState {
+     *      copy(property = newValue)
+     * }
+     * ```
      */
     protected fun setState(reducer: S.() -> S) {
         if (debugMode) {
@@ -68,6 +84,50 @@ abstract class BaseMviViewModel<S : MviState, A : MviArgs>(
         } else {
             stateStore.set(reducer)
         }
+    }
+
+    /**
+     * Call this to update the state of a specific property by providing a lambda that receives the current value of the
+     * property and returns the desired value of the property. For example:
+     *
+     * ```
+     * setState(MyViewState::counter) { currentCount ->
+     *      currentCount + 1
+     * }
+     * ```
+     */
+    protected fun <P> setState(property: KProperty1<S, P>, updater: (currentValue: P) -> P) {
+        setState {
+            val currentValue = property.get(this)
+            val updatedValue = updater(currentValue)
+
+            val copyArgs = mapOf(
+                stateCopyMethod.instanceParameter!! to this,
+                getStateCopyParameter(property) to updatedValue
+            )
+
+            stateCopyMethod.callBy(copyArgs)
+        }
+    }
+
+    /**
+     * Call this to update the state of a specific property.
+     */
+    protected fun <P> setState(property: KProperty1<S, P>, value: P) {
+        setState(property) { value }
+    }
+
+    /**
+     * Locates the [KParameter] on the state class using a [KProperty]. A cache hashmap is used to cache the property to
+     * parameter relationship so the parameter only needs to be looked up the first time this method is used.
+     */
+    private fun getStateCopyParameter(property: KProperty<*>): KParameter {
+        if (!stateCopyParamCache.contains(property)) {
+            val parameter = stateCopyMethod.findParameter(property)
+                ?: throw IllegalArgumentException("Unable to locate parameter corresponding to property ${property.name} on state class copy method.")
+            stateCopyParamCache[property] = parameter
+        }
+        return stateCopyParamCache[property]!!
     }
 
     /**

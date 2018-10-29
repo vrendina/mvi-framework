@@ -34,9 +34,9 @@ class CounterViewModel(
     }
 
     fun increaseCount() {
-        setState {
+        setState(CounterViewState::count) { count ->
             Log.d(tag, "Reducer running on ${Thread.currentThread().name}")
-            copy(count = count + 1)
+            count + 1
         }
 
         withState {
@@ -45,9 +45,6 @@ class CounterViewModel(
     }
 
     fun decreaseCount() {
-        setState {
-            Log.d(tag, "Reducer running on ${Thread.currentThread().name}")
-            copy(count = count - 1)
-        }
+        setState(CounterViewState::count) { it - 1 }
     }
 }

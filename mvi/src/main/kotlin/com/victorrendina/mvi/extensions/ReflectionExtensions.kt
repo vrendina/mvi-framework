@@ -2,6 +2,8 @@ package com.victorrendina.mvi.extensions
 
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
+import kotlin.reflect.KParameter
+import kotlin.reflect.KProperty
 import kotlin.reflect.full.memberFunctions
 
 internal val primitiveWrapperMap = mapOf(
@@ -36,3 +38,10 @@ fun isAssignableTo(from: Class<*>, to: Class<*>): Boolean {
 
 @Suppress("UNCHECKED_CAST")
 internal fun <T : Any> KClass<T>.copyMethod(): KFunction<T> = this.memberFunctions.first { it.name == "copy" } as KFunction<T>
+
+/**
+ * Find a parameter in a function that matches the property name and return type.
+ */
+internal fun KFunction<*>.findParameter(property: KProperty<*>): KParameter? = parameters.firstOrNull {
+    it.name == property.name && it.type == property.returnType
+}
