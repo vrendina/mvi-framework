@@ -41,30 +41,30 @@ abstract class MviListViewHolder<T>(
     /**
      * Called when data is bound to the view holder. Your subclass is responsible for providing an implementation.
      */
-    abstract fun onBind(item: T)
+    protected abstract fun onBind(item: T)
 
     /**
      * Called when this view holder is recycled.
      */
-    open fun onRecycle() {
+    protected open fun onRecycle() {
     }
 
     /**
      * Called when the RecyclerView is detached from the window and resources should be released.
      */
-    open fun onDestroy() {
+    protected open fun onDestroy() {
     }
 
     /**
      * When the view holder is bound and about to come on the screen.
      */
-    open fun onStart() {
+    protected open fun onStart() {
     }
 
     /**
      * Called when the view holder is detached from the screen. It may not be recycled.
      */
-    open fun onStop() {
+    protected open fun onStop() {
     }
 
     internal fun bind(item: T) {

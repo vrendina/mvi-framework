@@ -12,42 +12,32 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.PublishSubject
-import io.reactivex.subjects.Subject
 
-abstract class MviListAdapter<T, H : MviListViewHolder<T>>(lifecycleOwner: LifecycleOwner) :
-    RecyclerView.Adapter<H>() {
+abstract class MviListAdapter<T>(lifecycleOwner: LifecycleOwner) : RecyclerView.Adapter<MviListViewHolder<out T>>() {
 
     protected var data: List<T> = emptyList()
         private set
 
-    private val subject: Subject<MviDiffRequest> = PublishSubject.create()
-    private val subscription: Disposable
+    // Holds the subscription for the active DiffUtil request
+    private var subscription: Disposable? = null
 
-    private val viewHolders = HashSet<MviListViewHolder<T>>(10)
+    private val viewHolders = HashSet<MviListViewHolder<*>>(10)
 
     init {
-        subscription = subject.switchMap { calculateDiff(it) }
-            .observeOn(AndroidSchedulers.mainThread()).subscribe {
-                if (it.oldList === data) {
-                    data = it.newList
-                    it.result.dispatchUpdatesTo(this)
-                }
-            }
-
         lifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {
             @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
             fun onDestroy() {
                 lifecycleOwner.lifecycle.removeObserver(this)
-                subscription.dispose()
+                subscription?.dispose()
                 destroyViewHolders()
             }
         })
     }
 
     @CallSuper
-    override fun onBindViewHolder(holder: H, position: Int) {
-        holder.bind(data[position])
+    override fun onBindViewHolder(holder: MviListViewHolder<out T>, position: Int) {
+        @Suppress("UNCHECKED_CAST")
+        (holder as MviListViewHolder<T>).bind(data[position])
         viewHolders.add(holder)
     }
 
@@ -66,19 +56,19 @@ abstract class MviListAdapter<T, H : MviListViewHolder<T>>(lifecycleOwner: Lifec
     override fun getItemCount(): Int = data.size
 
     @CallSuper
-    override fun onViewAttachedToWindow(holder: H) {
+    override fun onViewAttachedToWindow(holder: MviListViewHolder<out T>) {
         super.onViewAttachedToWindow(holder)
         holder.attach()
     }
 
     @CallSuper
-    override fun onViewDetachedFromWindow(holder: H) {
+    override fun onViewDetachedFromWindow(holder: MviListViewHolder<out T>) {
         super.onViewDetachedFromWindow(holder)
         holder.detach()
     }
 
     @CallSuper
-    override fun onViewRecycled(holder: H) {
+    override fun onViewRecycled(holder: MviListViewHolder<out T>) {
         super.onViewRecycled(holder)
         holder.recycle()
     }
@@ -93,7 +83,11 @@ abstract class MviListAdapter<T, H : MviListViewHolder<T>>(lifecycleOwner: Lifec
      * to check for differences in the data set on a background thread.
      */
     fun updateData(data: List<T>) {
-        subject.onNext(MviDiffRequest(this.data, data))
+        subscription?.dispose()
+        subscription = calculateDiff(MviDiffRequest(this.data, data))
+            .subscribeOn(Schedulers.computation())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(::updateData)
     }
 
     /**
@@ -127,7 +121,14 @@ abstract class MviListAdapter<T, H : MviListViewHolder<T>>(lifecycleOwner: Lifec
     private fun calculateDiff(request: MviDiffRequest): Observable<MviDiffResult> {
         return Observable.fromCallable {
             MviDiffResult(request.oldList, request.newList)
-        }.subscribeOn(Schedulers.computation())
+        }
+    }
+
+    private fun updateData(result: MviDiffResult) {
+        if (result.oldList === data) {
+            this.data = result.newList
+            result.diff.dispatchUpdatesTo(this)
+        }
     }
 
     private fun diffCallback(oldList: List<T>, newList: List<T>): DiffUtil.Callback {
@@ -149,6 +150,6 @@ abstract class MviListAdapter<T, H : MviListViewHolder<T>>(lifecycleOwner: Lifec
     inner class MviDiffRequest(val oldList: List<T>, val newList: List<T>)
 
     inner class MviDiffResult(val oldList: List<T>, val newList: List<T>) {
-        val result: DiffUtil.DiffResult = DiffUtil.calculateDiff(diffCallback(oldList, newList))
+        val diff: DiffUtil.DiffResult = DiffUtil.calculateDiff(diffCallback(oldList, newList))
     }
 }

@@ -11,9 +11,9 @@ import com.victorrendina.mvi.views.MviListViewHolder
 import com.victorrendina.mvi.views.MviTouchableListAdapter
 
 class HomeListAdapter(lifecycleOwner: LifecycleOwner, private val viewModel: HomeListViewModel) :
-    MviTouchableListAdapter<HomeListItem, MviListViewHolder<HomeListItem>>(lifecycleOwner) {
+    MviTouchableListAdapter<HomeListItem>(lifecycleOwner) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MviListViewHolder<HomeListItem> {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MviListViewHolder<out HomeListItem> {
         return when (viewType) {
             VIEW_TYPE_HEADER_ITEM -> {
                 HomeHeaderViewHolder(parent.inflate(R.layout.list_item_header), viewModel)
@@ -36,7 +36,7 @@ class HomeListAdapter(lifecycleOwner: LifecycleOwner, private val viewModel: Hom
         }
     }
 
-    override fun syncMoveToViewModel(fromIndex: Int, toIndex: Int) {
+    override fun onItemMoved(fromIndex: Int, toIndex: Int) {
 //        viewModel.moveEntity(fromIndex, toIndex)
     }
 

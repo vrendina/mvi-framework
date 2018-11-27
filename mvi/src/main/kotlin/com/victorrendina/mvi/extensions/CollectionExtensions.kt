@@ -1,6 +1,7 @@
 package com.victorrendina.mvi.extensions
 
 import java.util.Collections
+import java.util.LinkedHashMap
 
 /**
  * Update an item in an immutable list. If the index does not exist in the list then this method will return a copy of
@@ -24,6 +25,21 @@ fun <T> List<T>.updateItem(index: Int, reducer: T.() -> T): List<T> = mapIndexed
  */
 fun <T> List<T>.updateItems(predicate: (T) -> Boolean, reducer: T.() -> T) = mapTo(ArrayList(size)) { item ->
     if (predicate(item)) item.reducer() else item
+}
+
+/**
+ * Update an item in an immutable map and return a copy of the map with the item updated. If the key does not exist
+ * a copy of the map will be returned without any changes.
+ *
+ * @param key the key of the item to update
+ * @param reducer function that will be called to update the item if it exists
+ * @return copy of the map with the item updated
+ */
+fun <K, V> Map<K, V>.updateItem(key: K, reducer: V.() -> V): Map<K, V>  {
+    this.values
+    return HashMap<K, V>(this).apply {
+        get(key)?.reducer()?.also { put(key, it) }
+    }
 }
 
 fun <T> List<T>.moveItem(fromIndex: Int, toIndex: Int): List<T> {

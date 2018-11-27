@@ -6,20 +6,18 @@ import android.support.v7.widget.helper.ItemTouchHelper
 import com.victorrendina.mvi.extensions.moveItem
 import com.victorrendina.mvi.extensions.removeItem
 
-abstract class MviTouchableListAdapter<T, H : MviListViewHolder<T>>(lifecycleOwner: LifecycleOwner) :
-    MviListAdapter<T, H>(lifecycleOwner) {
+abstract class MviTouchableListAdapter<T>(lifecycleOwner: LifecycleOwner) :
+    MviListAdapter<T>(lifecycleOwner) {
 
     protected open val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
     protected open val swipeDismissFlags = ItemTouchHelper.START or ItemTouchHelper.END
 
+    protected open val touchHelperCallback by lazy(mode = LazyThreadSafetyMode.NONE) {
+        MviItemTouchHelperCallback(this, dragFlags, swipeDismissFlags)
+    }
+
     private val touchHelper by lazy(mode = LazyThreadSafetyMode.NONE) {
-        ItemTouchHelper(
-            ItemTouchHelperCallback(
-                this,
-                dragFlags,
-                swipeDismissFlags
-            )
-        )
+        ItemTouchHelper(touchHelperCallback)
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
@@ -35,24 +33,24 @@ abstract class MviTouchableListAdapter<T, H : MviListViewHolder<T>>(lifecycleOwn
     fun moveItem(fromIndex: Int, toIndex: Int) {
         updateDataImmediate(data.moveItem(fromIndex, toIndex), false)
         notifyItemMoved(fromIndex, toIndex)
-        syncMoveToViewModel(fromIndex, toIndex)
+        onItemMoved(fromIndex, toIndex)
     }
 
     fun removeItem(index: Int) {
         updateDataImmediate(data.removeItem(index), false)
         notifyItemRemoved(index)
-        syncSwipeDismissToViewModel(index)
+        onItemRemoved(index)
     }
 
     /**
      * Override to update the view model whenever an item in the list is moved.
      */
-    open fun syncMoveToViewModel(fromIndex: Int, toIndex: Int) {
+    open fun onItemMoved(fromIndex: Int, toIndex: Int) {
     }
 
     /**
      * Override to update the view model whenever an item in the list is swiped to dismiss.
      */
-    open fun syncSwipeDismissToViewModel(index: Int) {
+    open fun onItemRemoved(index: Int) {
     }
 }

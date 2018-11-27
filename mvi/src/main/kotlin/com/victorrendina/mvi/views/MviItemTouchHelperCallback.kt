@@ -3,8 +3,8 @@ package com.victorrendina.mvi.views
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 
-internal class ItemTouchHelperCallback(
-    private val listener: MviTouchableListAdapter<*, *>,
+open class MviItemTouchHelperCallback(
+    private val adapter: MviTouchableListAdapter<*>,
     private val dragFlags: Int,
     private val swipeDismissFlags: Int
 ) : ItemTouchHelper.Callback() {
@@ -27,11 +27,11 @@ internal class ItemTouchHelperCallback(
 
         if (!target.moveEnabled) return false
 
-        listener.moveItem(source.adapterPosition, target.adapterPosition)
+        adapter.moveItem(source.adapterPosition, target.adapterPosition)
         return true
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        listener.removeItem(viewHolder.adapterPosition)
+        adapter.removeItem(viewHolder.adapterPosition)
     }
 }
