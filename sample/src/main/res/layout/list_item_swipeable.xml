@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.victorrendina.mvi.sample.swipemenu.SwipeRevealLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/swipeMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+>
+
+    <Button android:id="@+id/menuButton"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@android:color/holo_red_dark"
+            android:text="Delete"
+    />
+
+    <TextView
+            android:id="@+id/itemTextView"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:gravity="center"
+            android:background="?android:attr/selectableItemBackground"
+            tools:text="Testing the swipe menu layout"/>
+
+</com.victorrendina.mvi.sample.swipemenu.SwipeRevealLayout>

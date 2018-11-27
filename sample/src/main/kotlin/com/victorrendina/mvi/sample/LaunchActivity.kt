@@ -9,6 +9,7 @@ import com.victorrendina.mvi.sample.fancylist.FancyListActivity
 import com.victorrendina.mvi.sample.framework.BaseActivity
 import com.victorrendina.mvi.sample.list.SampleListActivity
 import com.victorrendina.mvi.sample.resetables.ResettableActivity
+import com.victorrendina.mvi.sample.swipemenu.SwipeMenuActivity
 import kotlinx.android.synthetic.main.activity_launch.*
 
 class LaunchActivity : BaseActivity() {
@@ -34,6 +35,11 @@ class LaunchActivity : BaseActivity() {
 
         fancyListButton.setOnClickListener {
             val intent = Intent(this, FancyListActivity::class.java)
+            startActivity(intent)
+        }
+
+        swipeMenuButton.setOnClickListener {
+            val intent = Intent(this, SwipeMenuActivity::class.java)
             startActivity(intent)
         }
     }

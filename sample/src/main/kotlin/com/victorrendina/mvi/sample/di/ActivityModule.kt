@@ -6,6 +6,7 @@ import com.victorrendina.mvi.sample.fancylist.FancyListActivity
 import com.victorrendina.mvi.sample.list.EmptyFragment
 import com.victorrendina.mvi.sample.list.SampleListActivity
 import com.victorrendina.mvi.sample.resetables.ResettableActivity
+import com.victorrendina.mvi.sample.swipemenu.SwipeMenuActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -29,6 +30,9 @@ abstract class ActivityModule {
 
     @ContributesAndroidInjector
     abstract fun fancyListActivity(): FancyListActivity
+
+    @ContributesAndroidInjector
+    abstract fun swipeMenuActivity(): SwipeMenuActivity
 
     // Fragment example
     @ContributesAndroidInjector

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="SwipeRevealLayout">
+        <attr name="srl_dragEdge">
+            <flag name="left" value="1" />
+            <flag name="right" value="2" />
+        </attr>
+
+        <attr name="srl_mode">
+            <enum name="edge" value="0" />
+            <enum name="under" value="1" />
+        </attr>
+
+        <attr name="srl_flingVelocity" format="integer" />
+    </declare-styleable>
+</resources>

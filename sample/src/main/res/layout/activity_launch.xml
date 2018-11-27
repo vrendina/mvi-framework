@@ -30,4 +30,10 @@
             android:layout_height="wrap_content"
             android:text="Fancy List"/>
 
+    <Button
+            android:id="@+id/swipeMenuButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Swipe Menu"/>
+
 </LinearLayout>
