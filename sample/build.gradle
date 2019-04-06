@@ -19,8 +19,8 @@ android {
         debug {
             debuggable true
             applicationIdSuffix ".debug"
-            minifyEnabled true
-            useProguard true
+            minifyEnabled false
+            useProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
@@ -69,6 +69,9 @@ dependencies {
     implementation deps.rx.android
     implementation deps.rx.kotlin
 
+    implementation deps.androidx.design
+    implementation deps.androidx.gridLayout
+
     implementation deps.androidx.lifecycle.extensions
     kapt deps.androidx.lifecycle.compiler
 
@@ -80,9 +83,9 @@ dependencies {
     testImplementation deps.robolectric.core
     testImplementation deps.robolectric.shadows
 
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    androidTestImplementation 'com.android.support.test:rules:1.0.2'
+    androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
+    androidTestImplementation 'androidx.test:rules:1.1.0-alpha4'
     androidTestImplementation deps.rx.idler
 
     kaptAndroidTest deps.dagger.compiler

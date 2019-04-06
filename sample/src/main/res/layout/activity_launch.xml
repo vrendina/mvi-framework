@@ -1,39 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="vertical">
+<androidx.gridlayout.widget.GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                       android:layout_width="match_parent"
+                                       android:layout_height="match_parent"
+                                       xmlns:app="http://schemas.android.com/apk/res-auto"
+                                       app:columnCount="3">
 
     <Button
-            android:id="@+id/counterButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Counter"/>
+        android:id="@+id/counterButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_columnWeight="1"
+        android:text="Counter" />
 
     <Button
-            android:id="@+id/listButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="List"/>
+        android:id="@+id/tabsButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_columnWeight="1"
+        android:text="Tabs" />
 
-    <Button
-            android:id="@+id/resetableButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Latches"/>
-
-    <Button
-            android:id="@+id/fancyListButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Fancy List"/>
-
-    <Button
-            android:id="@+id/swipeMenuButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Swipe Menu"/>
-
-</LinearLayout>
+</androidx.gridlayout.widget.GridLayout>

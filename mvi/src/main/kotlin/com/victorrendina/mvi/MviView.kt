@@ -1,6 +1,6 @@
 package com.victorrendina.mvi
 
-import android.arch.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleOwner
 import kotlin.reflect.KProperty1
 
 interface MviView : LifecycleOwner {

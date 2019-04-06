@@ -1,6 +1,6 @@
 package com.victorrendina.mvi
 
-import android.support.v4.util.SparseArrayCompat
+import androidx.collection.SparseArrayCompat
 import android.util.ArrayMap
 import android.util.LongSparseArray
 import android.util.SparseArray

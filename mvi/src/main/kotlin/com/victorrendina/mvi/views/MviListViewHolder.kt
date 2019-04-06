@@ -1,9 +1,11 @@
 package com.victorrendina.mvi.views
 
-import android.arch.lifecycle.Lifecycle
-import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.LifecycleRegistry
-import android.support.v7.widget.RecyclerView
+import android.content.Context
+import android.content.res.Resources
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
+import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import com.victorrendina.mvi.MviView
 import kotlinx.android.extensions.LayoutContainer
@@ -11,6 +13,9 @@ import kotlinx.android.extensions.LayoutContainer
 abstract class MviListViewHolder<T>(
     override val containerView: View
 ) : RecyclerView.ViewHolder(containerView), LayoutContainer, LifecycleOwner, MviView {
+
+    protected val context: Context = itemView.context
+    protected val resources: Resources = context.resources
 
     @Suppress("LeakingThis")
     private val lifecycleRegistry = LifecycleRegistry(this)
@@ -44,6 +49,13 @@ abstract class MviListViewHolder<T>(
     protected abstract fun onBind(item: T)
 
     /**
+     * Called when a non-empty change set is used to bind data to the view holder. Your adapter must
+     * override getChangeSet to provide a set of changes for this method to be called.
+     */
+    protected open fun onBind(item: T, changeSet: Set<String>) {
+    }
+
+    /**
      * Called when this view holder is recycled.
      */
     protected open fun onRecycle() {
@@ -62,27 +74,33 @@ abstract class MviListViewHolder<T>(
     }
 
     /**
-     * Called when the view holder is detached from the screen. It may not be recycled.
+     * Called when the view holder is detached from the screen. It may not be recycled. It is possible for the view
+     * to be detached and then reattached without recycling if it just moves slightly off screen.
      */
     protected open fun onStop() {
     }
 
     internal fun bind(item: T) {
-        if (boundItem != item) {
-            onBind(item)
-        }
         boundItem = item
+        onBind(item)
+    }
+
+    internal fun bind(item: T, changeSet: Set<String>) {
+        boundItem = item
+        onBind(item, changeSet)
     }
 
     internal fun attach() {
         if (!isDestroyed()) {
             lifecycleRegistry.markState(Lifecycle.State.STARTED)
+            onStart()
         }
     }
 
     internal fun detach() {
         if (!isDestroyed()) {
             lifecycleRegistry.markState(Lifecycle.State.CREATED)
+            onStop()
         }
     }
 

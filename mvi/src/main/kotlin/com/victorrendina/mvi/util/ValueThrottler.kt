@@ -18,13 +18,19 @@ open class ValueThrottler<T>(
     private val subscription: Disposable
 
     init {
-        subscription = values.throttleLast(interval, unit)
+        subscription = values.throttleLatest(interval, unit)
             .observeOn(scheduler)
             .subscribe(listener)
     }
 
     /**
      * Emit a value that will be throttled. It is safe to call this method from multiple threads.
+     * This method will start by emitting a value immediately and then won't emit the next value
+     * until after the interval has elapsed. If the interval has elapsed and no items have been emitted
+     * the next emission will happen immediately.
+     *
+     * See the marble diagram here:
+     * https://raw.githubusercontent.com/wiki/ReactiveX/RxJava/images/rx-operators/throttleLatest.png
      */
     fun emitValue(value: T) {
         if (!isDisposed) {

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:background="@color/colorAccent"
+>
+
+    <TextView
+            android:id="@+id/centerTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            tools:text="Center Text"
+    />
+
+    <Button
+            android:id="@+id/pushActivityButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Push Activity"/>
+
+    <Button
+            android:id="@+id/pushScreenButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Push Screen"/>
+
+    <Button
+            android:id="@+id/pushSubScreenButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Push Sub Screen"/>
+
+    <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/backEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Backstack Tag"
+            android:gravity="center"
+    />
+
+    <Button
+            android:id="@+id/goBackButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Go Back"/>
+
+
+</LinearLayout>

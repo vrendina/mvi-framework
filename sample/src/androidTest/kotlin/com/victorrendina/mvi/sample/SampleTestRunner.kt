@@ -2,7 +2,7 @@ package com.victorrendina.mvi.sample
 
 import android.app.Application
 import android.content.Context
-import android.support.test.runner.AndroidJUnitRunner
+import androidx.test.runner.AndroidJUnitRunner
 import io.reactivex.Scheduler
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.annotations.NonNull

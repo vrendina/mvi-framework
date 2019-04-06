@@ -1,13 +1,13 @@
 package com.victorrendina.mvi.sample.counter
 
-import android.content.res.Resources
 import android.util.Log
 import com.victorrendina.mvi.MviArgs
 import com.victorrendina.mvi.MviState
 import com.victorrendina.mvi.annotations.MviViewModel
-import com.victorrendina.mvi.sample.R
+import com.victorrendina.mvi.di.InjectableViewModelFactory
 import com.victorrendina.mvi.sample.framework.BaseViewModel
 import kotlinx.android.parcel.Parcelize
+import javax.inject.Inject
 
 @Parcelize
 data class CounterArgs(val initialCount: Int) : MviArgs
@@ -22,14 +22,10 @@ data class CounterViewState(val count: Int = 0) : MviState {
 @MviViewModel
 class CounterViewModel(
     initialState: CounterViewState,
-    arguments: CounterArgs?,
-    resources: Resources
+    arguments: CounterArgs?
 ) : BaseViewModel<CounterViewState, CounterArgs>(initialState, arguments) {
 
     init {
-        Log.d(tag, "Initialized: $this")
-        Log.d(tag, "Arguments $arguments")
-        Log.d(tag, "Resources: ${resources.getString(R.string.app_name)}")
         logStateChanges()
     }
 
@@ -48,5 +44,12 @@ class CounterViewModel(
         setState {
             copy(count = count - 1)
         }
+    }
+
+    class Factory @Inject constructor(): InjectableViewModelFactory<CounterViewModel, CounterViewState, CounterArgs> {
+        override fun create(initialState: CounterViewState, arguments: CounterArgs?): CounterViewModel {
+            return CounterViewModel(initialState, arguments)
+        }
+
     }
 }

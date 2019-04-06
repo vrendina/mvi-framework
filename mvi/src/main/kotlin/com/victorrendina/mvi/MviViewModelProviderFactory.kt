@@ -1,8 +1,8 @@
 package com.victorrendina.mvi
 
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
-import android.support.annotation.RestrictTo
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.annotation.RestrictTo
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 class MviViewModelProviderFactory<VM : BaseMviViewModel<*, *>>(private val creator: () -> VM) :

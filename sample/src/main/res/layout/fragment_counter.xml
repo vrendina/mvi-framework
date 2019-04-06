@@ -21,13 +21,13 @@
             android:id="@+id/increaseShared"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Increase Shared"/>
+            android:text="Increase Shared" />
 
         <Button
             android:id="@+id/decreaseShared"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Decrease Shared"/>
+            android:text="Decrease Shared" />
 
     </LinearLayout>
 
@@ -47,14 +47,20 @@
             android:id="@+id/increaseFragment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Increase Fragment"/>
+            android:text="Increase Fragment" />
 
         <Button
             android:id="@+id/decreaseFragment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Decrease Fragment"/>
+            android:text="Decrease Fragment" />
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/nextScreen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Next Screen" />
 
 </LinearLayout>

@@ -1,46 +1,40 @@
 package com.victorrendina.mvi.sample
 
-import android.content.Intent
 import android.os.Bundle
-import com.victorrendina.mvi.extensions.addArguments
-import com.victorrendina.mvi.sample.counter.CounterActivity
+import android.view.View
 import com.victorrendina.mvi.sample.counter.CounterArgs
-import com.victorrendina.mvi.sample.fancylist.FancyListActivity
+import com.victorrendina.mvi.sample.counter.CounterFragment
 import com.victorrendina.mvi.sample.framework.BaseActivity
-import com.victorrendina.mvi.sample.list.SampleListActivity
-import com.victorrendina.mvi.sample.resetables.ResettableActivity
-import com.victorrendina.mvi.sample.swipemenu.SwipeMenuActivity
+import com.victorrendina.mvi.sample.framework.BaseFragmentActivity
+import com.victorrendina.mvi.sample.framework.nav.screen
+import com.victorrendina.mvi.sample.tabs.SampleTabHostFragment
 import kotlinx.android.synthetic.main.activity_launch.*
 
-class LaunchActivity : BaseActivity() {
+class LaunchActivity : BaseActivity(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launch)
 
-        counterButton.setOnClickListener {
-            val intent = Intent(this, CounterActivity::class.java).addArguments(CounterArgs(5))
-            startActivity(intent)
-        }
+        counterButton.setOnClickListener(this)
+        tabsButton.setOnClickListener(this)
+    }
 
-        listButton.setOnClickListener {
-            val intent = Intent(this, SampleListActivity::class.java)
-            startActivity(intent)
-        }
-
-        resetableButton.setOnClickListener {
-            val intent = Intent(this, ResettableActivity::class.java)
-            startActivity(intent)
-        }
-
-        fancyListButton.setOnClickListener {
-            val intent = Intent(this, FancyListActivity::class.java)
-            startActivity(intent)
-        }
-
-        swipeMenuButton.setOnClickListener {
-            val intent = Intent(this, SwipeMenuActivity::class.java)
-            startActivity(intent)
+    override fun onClick(v: View) {
+        when (v.id) {
+            R.id.counterButton -> {
+                screen(CounterFragment::class.java) {
+                    activity = BaseFragmentActivity::class.java
+                    arguments = CounterArgs(initialCount = 64)
+                }.apply { startActivity(this@LaunchActivity) }
+            }
+            R.id.tabsButton -> {
+                screen(SampleTabHostFragment::class.java) {
+                    activity = BaseFragmentActivity::class.java
+                }.apply { startActivity(this@LaunchActivity) }
+            }
         }
     }
+
+
 }

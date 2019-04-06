@@ -8,6 +8,8 @@ import com.victorrendina.mvi.extensions.activityViewModel
 import com.victorrendina.mvi.extensions.viewModel
 import com.victorrendina.mvi.sample.R
 import com.victorrendina.mvi.sample.framework.BaseFragment
+import com.victorrendina.mvi.sample.framework.nav.screen
+import com.victorrendina.mvi.withState
 import kotlinx.android.synthetic.main.fragment_counter.*
 
 class CounterFragment : BaseFragment() {
@@ -44,5 +46,13 @@ class CounterFragment : BaseFragment() {
         decreaseFragment.setOnClickListener { viewModel.decreaseCount() }
         increaseShared.setOnClickListener { sharedViewModel.increaseCount() }
         decreaseShared.setOnClickListener { sharedViewModel.decreaseCount() }
+        nextScreen.setOnClickListener {
+            // Pass the current fragment count to the next screen and start from that, activity
+            // count will not be effected.
+            val currentFragmentCount = withState(viewModel) { it.count }
+            nav.pushScreen(screen(CounterFragment::class.java) {
+                arguments = CounterArgs(currentFragmentCount)
+            })
+        }
     }
 }

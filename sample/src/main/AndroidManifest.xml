@@ -16,11 +16,8 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".counter.CounterActivity"/>
-        <activity android:name=".list.SampleListActivity"/>
-        <activity android:name=".resetables.ResettableActivity"/>
-        <activity android:name=".fancylist.FancyListActivity"/>
-        <activity android:name=".swipemenu.SwipeMenuActivity"/>
+
+        <activity android:name=".framework.BaseFragmentActivity"/>
     </application>
 
 </manifest>

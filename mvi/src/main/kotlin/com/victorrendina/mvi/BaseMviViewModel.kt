@@ -1,13 +1,11 @@
 package com.victorrendina.mvi
 
 import android.annotation.SuppressLint
-import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.ViewModel
-import android.support.annotation.CallSuper
-import android.support.annotation.RestrictTo
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModel
+import androidx.annotation.CallSuper
+import androidx.annotation.RestrictTo
 import android.util.Log
-import com.victorrendina.mvi.extensions.copyMethod
-import com.victorrendina.mvi.extensions.findParameter
 import com.victorrendina.rxqueue2.QueueSubject
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -18,11 +16,8 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.Subject
-import kotlin.reflect.KParameter
-import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty1
 import kotlin.reflect.KVisibility
-import kotlin.reflect.full.instanceParameter
 
 @SuppressLint("RxSubscribeOnError")
 abstract class BaseMviViewModel<S : MviState, A : MviArgs>(
@@ -43,6 +38,10 @@ abstract class BaseMviViewModel<S : MviState, A : MviArgs>(
     init {
         disposables.add(stateStore)
         if (debugMode) {
+            Log.d(tag, "Initialized view model $tag")
+            Log.d(tag, "Initial state: $initialState")
+            Log.d(tag, "Arguments: $arguments")
+
             mutableStateChecker = MutableStateChecker(initialState)
 
             Completable.fromRunnable {
@@ -66,6 +65,9 @@ abstract class BaseMviViewModel<S : MviState, A : MviArgs>(
      * ```
      */
     protected fun setState(reducer: S.() -> S) {
+        if (stateStore.isDisposed) {
+            throw IllegalStateException("Attempted to update state after state store was disposed. Are you calling setState from onCleared()?")
+        }
         if (debugMode) {
             // Must use `set` to ensure the validated state is the same as the actual state used in reducer
             // Do not use `get` since `getState` queue has lower priority and the validated state would be the state after reduced
@@ -73,7 +75,11 @@ abstract class BaseMviViewModel<S : MviState, A : MviArgs>(
                 val firstState = this.reducer()
                 val secondState = this.reducer()
 
-                if (firstState != secondState) throw IllegalArgumentException("Your reducer must be pure!")
+                if (firstState != secondState) {
+                    Log.e(tag, "First state: $firstState")
+                    Log.e(tag, "Second state: $secondState")
+                    throw IllegalArgumentException("Your reducer must be pure!")
+                }
                 mutableStateChecker.onStateChanged(firstState)
 
                 firstState
@@ -84,11 +90,28 @@ abstract class BaseMviViewModel<S : MviState, A : MviArgs>(
     }
 
     /**
+     * Only run the state reducer if the predicate returns true. The predicate received the current value of the state
+     * and can be used to make a decision about updating the state.
+     */
+    protected fun setState(predicate: (S) -> Boolean, reducer: S.() -> S) {
+        setState {
+            if (predicate(this)) {
+                this.reducer()
+            } else this
+        }
+    }
+
+    /**
      * Access the current ViewModel state. Takes a block of code that will be run after all current pending state
-     * updates are processed.
+     * updates are processed. If the state store has been disposed this block of code will be executed synchronously
+     * on whatever thread it was called from without waiting for state updates.
      */
     protected fun withState(block: (state: S) -> Unit) {
-        stateStore.get(block)
+        if (stateStore.isDisposed) {
+            block(state)
+        } else {
+            stateStore.get(block)
+        }
     }
 
     /**
@@ -340,7 +363,7 @@ abstract class BaseMviViewModel<S : MviState, A : MviArgs>(
 
         val lifecycleAwareObserver = MviLifecycleAwareObserver(
             lifecycleOwner,
-            alwaysDeliverLastValueWhenUnlocked = false,
+            alwaysDeliverLastValueWhenUnlocked = true,
             onNext = Consumer<T> { subscriber(it) },
             destroyCallback = { disposables.remove(it) }
         )

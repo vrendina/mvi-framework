@@ -1,6 +1,6 @@
 package com.victorrendina.mvi.di
 
-import android.arch.lifecycle.ViewModel
+import androidx.lifecycle.ViewModel
 import com.victorrendina.mvi.BaseMviViewModel
 import com.victorrendina.mvi.MviArgs
 import com.victorrendina.mvi.MviState

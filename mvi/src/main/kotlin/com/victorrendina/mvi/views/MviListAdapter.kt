@@ -1,13 +1,15 @@
 package com.victorrendina.mvi.views
 
-import android.arch.lifecycle.Lifecycle
-import android.arch.lifecycle.LifecycleObserver
-import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.OnLifecycleEvent
-import android.support.annotation.CallSuper
-import android.support.v7.util.DiffUtil
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.SimpleItemAnimator
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.OnLifecycleEvent
+import androidx.annotation.CallSuper
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListUpdateCallback
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
+import android.util.Log
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -18,10 +20,26 @@ abstract class MviListAdapter<T>(lifecycleOwner: LifecycleOwner) : RecyclerView.
     protected var data: List<T> = emptyList()
         private set
 
+    /**
+     * If the DiffUtil calculations should detect items being moved in the list. If items will never
+     * be moved in the list this should be set to false to save an extra pass in the calculations.
+     *
+     * If an item is moved when this is set to false the DiffUtil will report an item as removed and then
+     * added rather than moved, so the item will still get moved it just won't have a nice animation.
+     */
+    protected open val detectMoves = false
+
+    /**
+     * Log diagnostic information about the results of the diff calculation.
+     */
+    protected open val logDiffResults = false
+
+    protected val tag: String by lazy { javaClass.simpleName }
+
     // Holds the subscription for the active DiffUtil request
     private var subscription: Disposable? = null
 
-    private val viewHolders = HashSet<MviListViewHolder<*>>(10)
+    private var recyclerView: RecyclerView? = null
 
     init {
         lifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {
@@ -38,11 +56,34 @@ abstract class MviListAdapter<T>(lifecycleOwner: LifecycleOwner) : RecyclerView.
     override fun onBindViewHolder(holder: MviListViewHolder<out T>, position: Int) {
         @Suppress("UNCHECKED_CAST")
         (holder as MviListViewHolder<T>).bind(data[position])
-        viewHolders.add(holder)
     }
 
+    @CallSuper
+    override fun onBindViewHolder(holder: MviListViewHolder<out T>, position: Int, payloads: MutableList<Any>) {
+        if (payloads.isEmpty()) {
+            super.onBindViewHolder(holder, position, payloads)
+        } else {
+            val changeSet = HashSet<String>()
+            // Combine all the payloads into a single change set
+            payloads.forEach {
+                @Suppress("UNCHECKED_CAST")
+                changeSet.addAll(it as Set<String>)
+            }
+
+            if (changeSet.isEmpty()) {
+                // If there were no changes detected, call through to the normal [onBindViewHolder] method
+                super.onBindViewHolder(holder, position, payloads)
+            } else {
+                @Suppress("UNCHECKED_CAST")
+                (holder as MviListViewHolder<T>).bind(data[position], changeSet)
+            }
+        }
+    }
+
+    @CallSuper
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
+        this.recyclerView = recyclerView
         // Change animations cause views to flash when they are updated and breaks sliders when user is interacting
         (recyclerView.itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
     }
@@ -51,6 +92,7 @@ abstract class MviListAdapter<T>(lifecycleOwner: LifecycleOwner) : RecyclerView.
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
         super.onDetachedFromRecyclerView(recyclerView)
         destroyViewHolders()
+        this.recyclerView = null
     }
 
     override fun getItemCount(): Int = data.size
@@ -74,20 +116,26 @@ abstract class MviListAdapter<T>(lifecycleOwner: LifecycleOwner) : RecyclerView.
     }
 
     private fun destroyViewHolders() {
-        viewHolders.forEach { it.destroy() }
-        viewHolders.clear()
+        for (index in 0 until data.size) {
+            (recyclerView?.findViewHolderForAdapterPosition(index) as? MviListViewHolder<*>)?.destroy()
+        }
     }
 
     /**
      * Update the list of data associated with this adapter. This will trigger the differ
-     * to check for differences in the data set on a background thread.
+     * to check for differences in the data set on a background thread. If the adapter
+     * doesn't have any data then [updateDataImmediate] will be called.
      */
     fun updateData(data: List<T>) {
-        subscription?.dispose()
-        subscription = calculateDiff(MviDiffRequest(this.data, data))
-            .subscribeOn(Schedulers.computation())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(::updateData)
+        if (itemCount == 0) {
+            updateDataImmediate(data)
+        } else {
+            subscription?.dispose()
+            subscription = calculateDiff(MviDiffRequest(this.data, data))
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(::updateData)
+        }
     }
 
     /**
@@ -118,6 +166,16 @@ abstract class MviListAdapter<T>(lifecycleOwner: LifecycleOwner) : RecyclerView.
         return oldItem == newItem
     }
 
+    /**
+     * If [areContentsTheSame] returns false this method can be overridden to return a set that
+     * contains keys that indicate which data has changed. When the ViewHolder is updated the
+     * bind(item, changeSet) method will be invoked and the ViewHolder should only update items indicated
+     * by the changeSet.
+     */
+    open fun getChangeSet(oldItem: T, newItem: T): Set<String> {
+        return emptySet()
+    }
+
     private fun calculateDiff(request: MviDiffRequest): Observable<MviDiffResult> {
         return Observable.fromCallable {
             MviDiffResult(request.oldList, request.newList)
@@ -127,7 +185,40 @@ abstract class MviListAdapter<T>(lifecycleOwner: LifecycleOwner) : RecyclerView.
     private fun updateData(result: MviDiffResult) {
         if (result.oldList === data) {
             this.data = result.newList
-            result.diff.dispatchUpdatesTo(this)
+            result.diff.dispatchUpdatesTo(object : ListUpdateCallback {
+                override fun onChanged(position: Int, count: Int, payload: Any?) {
+                    notifyItemRangeChanged(position, count, payload)
+                    logDiffResult("onChanged - position: $position count: $count changes: $payload")
+                }
+
+                override fun onMoved(fromPosition: Int, toPosition: Int) {
+                    notifyItemMoved(fromPosition, toPosition)
+                    logDiffResult("onMoved - from: $fromPosition to: $toPosition")
+                }
+
+                override fun onInserted(position: Int, count: Int) {
+                    notifyItemRangeInserted(position, count)
+                    logDiffResult("onInserted - position: $position count: $count old list size: ${result.oldList.size} new list size: ${result.newList.size}")
+                    /*
+                     If items are appended to the end of the list, the previous last item needs to be updated so
+                     item decorations are re-drawn correctly.
+                     */
+                    if (position == result.oldList.size) {
+                        notifyItemChanged(position - 1, null)
+                    }
+                }
+
+                override fun onRemoved(position: Int, count: Int) {
+                    notifyItemRangeRemoved(position, count)
+                    logDiffResult("onRemoved - position: $position count: $count")
+                }
+            })
+        }
+    }
+
+    private fun logDiffResult(message: String) {
+        if (logDiffResults) {
+            Log.d(tag, message)
         }
     }
 
@@ -144,12 +235,17 @@ abstract class MviListAdapter<T>(lifecycleOwner: LifecycleOwner) : RecyclerView.
             override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
                 return areContentsTheSame(oldList[oldItemPosition], newList[newItemPosition])
             }
+
+            override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
+                val changeSet = getChangeSet(oldList[oldItemPosition], newList[newItemPosition])
+                return if (changeSet.isEmpty()) null else changeSet
+            }
         }
     }
 
     inner class MviDiffRequest(val oldList: List<T>, val newList: List<T>)
 
     inner class MviDiffResult(val oldList: List<T>, val newList: List<T>) {
-        val diff: DiffUtil.DiffResult = DiffUtil.calculateDiff(diffCallback(oldList, newList))
+        val diff: DiffUtil.DiffResult = DiffUtil.calculateDiff(diffCallback(oldList, newList), detectMoves)
     }
 }

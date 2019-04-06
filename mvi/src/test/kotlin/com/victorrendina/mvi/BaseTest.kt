@@ -2,8 +2,8 @@ package com.victorrendina.mvi
 
 import android.os.Bundle
 import android.os.Parcelable
-import android.support.v4.app.Fragment
-import android.support.v7.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AppCompatActivity
 import io.reactivex.Scheduler
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.annotations.NonNull
@@ -53,7 +53,7 @@ abstract class BaseTest {
         }
     }
 
-    protected inline fun <reified F : Fragment, reified A : AppCompatActivity> createFragment(
+    protected inline fun <reified F : androidx.fragment.app.Fragment, reified A : AppCompatActivity> createFragment(
         savedInstanceState: Bundle? = null,
         args: Parcelable? = null
     ): Pair<F, ActivityController<A>> {

@@ -1,7 +1,6 @@
 package com.victorrendina.mvi.extensions
 
 import java.util.Collections
-import java.util.LinkedHashMap
 
 /**
  * Update an item in an immutable list. If the index does not exist in the list then this method will return a copy of
@@ -29,40 +28,39 @@ fun <T> List<T>.updateItems(predicate: (T) -> Boolean, reducer: T.() -> T) = map
 
 /**
  * Update an item in an immutable map and return a copy of the map with the item updated. If the key does not exist
- * a copy of the map will be returned without any changes.
+ * a copy of the map will be returned without any changes unless a factory is provided to create a default instance
+ * of the item when it can't be found.
  *
  * @param key the key of the item to update
+ * @param factory optional function that will return a default instance of the item if it doesn't exist in the map
  * @param reducer function that will be called to update the item if it exists
  * @return copy of the map with the item updated
  */
-fun <K, V> Map<K, V>.updateItem(key: K, reducer: V.() -> V): Map<K, V>  {
-    this.values
+fun <K, V> Map<K, V>.updateItem(key: K, factory: ((K) -> V)? = null, reducer: V.() -> V): Map<K, V> {
     return HashMap<K, V>(this).apply {
-        get(key)?.reducer()?.also { put(key, it) }
+        (get(key) ?: factory?.invoke(key))?.reducer()?.also { put(key, it) }
     }
 }
 
 fun <T> List<T>.moveItem(fromIndex: Int, toIndex: Int): List<T> {
     val mutableList = ArrayList(this)
-    if (fromIndex < toIndex) {
-        for (i in fromIndex until toIndex) {
-            Collections.swap(mutableList, i, i + 1)
-        }
-    } else {
-        for (i in fromIndex downTo toIndex + 1) {
-            Collections.swap(mutableList, i, i - 1)
+    val bounds = 0..(size - 1)
+    if (fromIndex in bounds && toIndex in bounds) {
+        if (fromIndex < toIndex) {
+            for (i in fromIndex until toIndex) {
+                Collections.swap(mutableList, i, i + 1)
+            }
+        } else {
+            for (i in fromIndex downTo toIndex + 1) {
+                Collections.swap(mutableList, i, i - 1)
+            }
         }
     }
     return mutableList
 }
 
 fun <T> List<T>.removeItem(index: Int): List<T> = ArrayList(this).apply {
-    removeAt(index)
-}
-
-fun <T> Iterable<T>.findIndex(predicate: (T) -> Boolean): Int {
-    forEachIndexed { index, item ->
-        if (predicate(item)) return index
+    if (index in 0..(size - 1)) {
+        removeAt(index)
     }
-    return -1
 }
