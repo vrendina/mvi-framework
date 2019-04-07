@@ -11,12 +11,12 @@ import com.victorrendina.mvi.sample.R
 import com.victorrendina.mvi.sample.framework.BaseFragment
 import com.victorrendina.mvi.sample.framework.BaseFragmentActivity
 import com.victorrendina.mvi.sample.framework.nav.screen
-import com.victorrendina.mvi.sample.framework.tabnav.TabRootFragment
+import com.victorrendina.mvi.sample.framework.tabnav.TabRootItem
 import kotlinx.android.parcel.Parcelize
 import kotlinx.android.synthetic.main.fragment_sample_tab.*
 
 
-class SampleTabFragment: BaseFragment() {
+class SampleTabFragment : BaseFragment() {
 
     private val arguments: SampleTabArgs by args()
 
@@ -50,14 +50,28 @@ class SampleTabFragment: BaseFragment() {
         }
 
         goBackButton.setOnClickListener {
-            val tag = backEditText.text.toString()
-            if (!tag.isBlank()) {
-                Log.d("Test", "Going back to '$tag'")
-                tabNav.goBack(tag)
-            } else {
-                tabNav.goBack()
+            try {
+                if (!tabNav.goBack()) {
+                    nav.goBack()
+                }
+            } catch (e: IllegalStateException) {
+                nav.goBack()
             }
         }
+
+        goBackToRoot.setOnClickListener {
+            try {
+                if (!tabNav.goBack("root")) {
+                    nav.goBack()
+                }
+            } catch (e: IllegalStateException) {
+                nav.goBack()
+            }
+        }
+    }
+
+    override fun onTabSelected(item: TabRootItem) {
+        Log.d("SampleTab", "${arguments.centerText} -- Tab selected $item")
     }
 
 }
@@ -66,4 +80,4 @@ class SampleTabFragment: BaseFragment() {
 data class SampleTabArgs(
     val centerText: String,
     val depth: Int = 0
-): MviArgs
+) : MviArgs

@@ -33,7 +33,7 @@ class TabRootFragment : BaseFragment(), TabNavHost {
             pushScreen(arguments.initialScreen.copy(
                 enterAnimation = 0,
                 popExitAnimation = 0,
-                addToBackStack = false
+                addToBackStack = true
             ))
         }
     }
@@ -53,12 +53,12 @@ class TabRootFragment : BaseFragment(), TabNavHost {
         transaction.commit()
     }
 
-    override fun goBack(backstackTag: String?): Boolean {
-        if (backstackTag != null) {
-            return childFragmentManager.popBackStackImmediate(backstackTag, 0)
+    override fun goBack(backStackTag: String?): Boolean {
+        if (backStackTag != null) {
+            return childFragmentManager.popBackStackImmediate(backStackTag, 0)
         }
 
-        if (childFragmentManager.backStackEntryCount > 0) {
+        if (childFragmentManager.backStackEntryCount > 1) {
             childFragmentManager.popBackStack()
             return true
         }

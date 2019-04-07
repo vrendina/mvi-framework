@@ -46,8 +46,13 @@ open class BaseFragmentActivity : BaseActivity(), NavHost {
     protected open fun createScreen(screen: Screen) {
         // Don't run the fragment enter/pop exit animations if this is the first screen, they will be run
         // by the activity.
-        // TODO Change so doesn't get added to back stack either
-        pushFragment(screen.copy(enterAnimation = 0, popExitAnimation = 0))
+        pushFragment(
+            screen.copy(
+                enterAnimation = 0,
+                popExitAnimation = 0,
+                addToBackStack = true
+            )
+        )
     }
 
     override fun animateActivityEnter() {
@@ -99,11 +104,11 @@ open class BaseFragmentActivity : BaseActivity(), NavHost {
         goBackInternal()
     }
 
-    override fun goBack(backstackTag: String?) {
-        if (backstackTag == null) {
+    override fun goBack(backStackTag: String?) {
+        if (backStackTag == null) {
             goBackInternal()
         } else {
-            if (!supportFragmentManager.popBackStackImmediate(backstackTag, 0)) {
+            if (!supportFragmentManager.popBackStackImmediate(backStackTag, 0)) {
                 // Close the activity if an invalid screen is provided
                 finish()
             }
@@ -114,7 +119,6 @@ open class BaseFragmentActivity : BaseActivity(), NavHost {
      * Go back to the previous screen or close this activity if it is the first screen in the stack.
      */
     private fun goBackInternal() {
-        // TODO Don't add first fragment to the back stack
         if (supportFragmentManager.backStackEntryCount == 1) {
             finish()
         } else {

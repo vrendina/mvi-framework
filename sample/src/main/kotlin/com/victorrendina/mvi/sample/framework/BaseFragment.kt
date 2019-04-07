@@ -31,7 +31,7 @@ abstract class BaseFragment : Fragment(), MviView {
 
     protected val tabNav: TabNavHost by lazy(mode = LazyThreadSafetyMode.NONE) {
         parentFragment as? TabNavHost
-        ?: throw IllegalStateException("To use tab navigation your fragment must be hosted in a parent fragment that implements 'TabNavHost'")
+            ?: throw IllegalStateException("To use tab navigation your fragment must be hosted in a parent fragment that implements 'TabNavHost'")
     }
 
     protected val backgroundImage: ImageView?
@@ -86,9 +86,11 @@ abstract class BaseFragment : Fragment(), MviView {
         if (rootParentFragment?.suppressChildAnimations == true) {
             val screen = rootParentFragment.arguments?.getScreen()
             if (screen != null) {
-                val rootExitAnimation = AnimationUtils.loadAnimation(requireContext(), screen.exitAnimation)
+                val animation = if (enter) screen.enterAnimation else screen.exitAnimation
+                val rootDuration =
+                    if (animation != 0) AnimationUtils.loadAnimation(requireContext(), animation).duration else 0
                 return AlphaAnimation(1f, 1f).apply {
-                    duration = rootExitAnimation.duration
+                    duration = rootDuration
                 }
             }
         }

@@ -37,19 +37,17 @@
             android:layout_height="wrap_content"
             android:text="Push Sub Screen"/>
 
-    <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/backEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Backstack Tag"
-            android:gravity="center"
-    />
-
     <Button
             android:id="@+id/goBackButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Go Back"/>
+
+    <Button
+            android:id="@+id/goBackToRoot"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Go Back To Root"/>
 
 
 </LinearLayout>

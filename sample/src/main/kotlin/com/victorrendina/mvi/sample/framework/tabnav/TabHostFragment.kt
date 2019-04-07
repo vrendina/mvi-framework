@@ -14,7 +14,10 @@ import com.victorrendina.mvi.sample.framework.BaseFragment
 import com.victorrendina.mvi.sample.framework.nav.Screen
 import kotlinx.android.synthetic.main.fragment_tab_navigation.*
 
-
+/**
+ * When creating a screen with tab navigation you must override this fragment and provide a menu resource
+ * and a screen bundle that will be used to initialize each tab based on the id specified in the menu resource.
+ */
 abstract class TabHostFragment : BaseFragment() {
 
     /**
@@ -34,7 +37,8 @@ abstract class TabHostFragment : BaseFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        childFragmentManager.registerFragmentLifecycleCallbacks(object: FragmentManager.FragmentLifecycleCallbacks() {
+        // Notify all child fragment tabs when their view is created which tab is currently selected
+        childFragmentManager.registerFragmentLifecycleCallbacks(object : FragmentManager.FragmentLifecycleCallbacks() {
             override fun onFragmentViewCreated(fm: FragmentManager, f: Fragment, v: View, savedInstanceState: Bundle?) {
                 if (f is BaseFragment) {
                     f.onTabSelected(getCurrentTab())
@@ -91,10 +95,16 @@ abstract class TabHostFragment : BaseFragment() {
         adapter.data = data
     }
 
+    /**
+     * Get the currently selected tab.
+     */
     fun getCurrentTab(): TabRootItem {
         return adapter.data[tabNavViewPager.currentItem]
     }
 
+    /**
+     * Programmatically change the currently selected tab using the id of the menu item.
+     */
     fun setTab(@IdRes id: Int) {
         tabNavViewPager.setItem(id)
     }

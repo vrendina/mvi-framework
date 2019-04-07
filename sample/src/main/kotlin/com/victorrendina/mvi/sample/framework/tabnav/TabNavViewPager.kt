@@ -17,6 +17,11 @@ class TabNavViewPager @JvmOverloads constructor(
      */
     var disableSwipe = true
 
+    /**
+     * Animate changes when switching between tabs.
+     */
+    var animateTabChanges = true
+
     init {
         offscreenPageLimit = MAX_TABS - 1
         overScrollMode = ViewPager.OVER_SCROLL_NEVER
@@ -44,7 +49,7 @@ class TabNavViewPager @JvmOverloads constructor(
      * Set the current tab using the array index. This method should not be used.
      */
     override fun setCurrentItem(item: Int) {
-        super.setCurrentItem(item, true)
+        super.setCurrentItem(item, animateTabChanges)
     }
 
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {

@@ -1,7 +1,6 @@
 package com.victorrendina.mvi.sample.framework.tabnav
 
 import android.os.Bundle
-import android.view.MenuItem
 import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -20,6 +19,7 @@ class TabNavAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm) {
         }
 
     override fun getItem(position: Int): Fragment {
+        // Wrap the screen in a tab root fragment to provide sub-navigation
         val rootFragment = TabRootFragment()
         rootFragment.arguments = Bundle().apply {
             putParcelable(
@@ -44,8 +44,6 @@ class TabNavAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm) {
         }
         return PagerAdapter.POSITION_NONE
     }
-
-    fun getItemPosition(item: MenuItem) = data.indexOfFirst { it.id == item.itemId }
 
     fun getItemPosition(@IdRes id: Int) = data.indexOfFirst { it.id == id }
 
