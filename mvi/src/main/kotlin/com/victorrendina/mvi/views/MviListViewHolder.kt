@@ -2,11 +2,11 @@ package com.victorrendina.mvi.views
 
 import android.content.Context
 import android.content.res.Resources
+import android.view.View
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.recyclerview.widget.RecyclerView
-import android.view.View
 import com.victorrendina.mvi.MviView
 import kotlinx.android.extensions.LayoutContainer
 
@@ -40,7 +40,7 @@ abstract class MviListViewHolder<T>(
     open val swipeDismissEnabled: Boolean = false
 
     init {
-        lifecycleRegistry.markState(Lifecycle.State.INITIALIZED)
+        lifecycleRegistry.markState(Lifecycle.State.CREATED)
     }
 
     /**
@@ -56,15 +56,25 @@ abstract class MviListViewHolder<T>(
     }
 
     /**
-     * Called when this view holder is recycled.
+     * Called when this view holder is recycled. It is impossible to tell if the view holder will be reused
+     * again so any cleanup work should be done in this method, keeping in mind that the view could potentially
+     * still be re-used.
      */
     protected open fun onRecycle() {
     }
 
     /**
-     * Called when the RecyclerView is detached from the window and resources should be released.
+     * Start any view model or RxJava subscriptions here and then clean them up in the corresponding [disposeSubscriptions]
+     * method.
      */
-    protected open fun onDestroy() {
+    protected open fun startSubscriptions() {
+    }
+
+    /**
+     * Dispose of any existing subscriptions. It is not necessary to do anything with view model subscriptions
+     * but RxJava subscriptions should be disposed.
+     */
+    protected open fun disposeSubscriptions() {
     }
 
     /**
@@ -81,7 +91,22 @@ abstract class MviListViewHolder<T>(
     }
 
     internal fun bind(item: T) {
+        val initialState = lifecycleRegistry.currentState
+
+        // Clean up any existing subscriptions by recycling this view when re-binding if it hasn't been recycled yet
+        if (initialState != Lifecycle.State.DESTROYED) {
+            recycle()
+        }
+
+        // Restore the lifecycle state of the view holder to the previous state before recycling
+        if (initialState == Lifecycle.State.STARTED) {
+            lifecycleRegistry.markState(Lifecycle.State.STARTED)
+        } else {
+            lifecycleRegistry.markState(Lifecycle.State.CREATED)
+        }
+
         boundItem = item
+        startSubscriptions()
         onBind(item)
     }
 
@@ -105,14 +130,10 @@ abstract class MviListViewHolder<T>(
     }
 
     internal fun recycle() {
-        boundItem = null
-        onRecycle()
-    }
-
-    internal fun destroy() {
         lifecycleRegistry.markState(Lifecycle.State.DESTROYED)
+        disposeSubscriptions()
+        onRecycle()
         boundItem = null
-        onDestroy()
     }
 
     private fun isDestroyed() = lifecycle.currentState == Lifecycle.State.DESTROYED

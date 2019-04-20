@@ -1,21 +1,40 @@
 package com.victorrendina.mvi.views
 
+import android.util.Log
+import androidx.annotation.CallSuper
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
 import androidx.lifecycle.OnLifecycleEvent
-import androidx.annotation.CallSuper
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListUpdateCallback
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
-import android.util.Log
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
-abstract class MviListAdapter<T>(lifecycleOwner: LifecycleOwner) : RecyclerView.Adapter<MviListViewHolder<out T>>() {
+/**
+ * The [MviListAdapter] serves as the base adapter for all RecyclerView based lists. The adapter is designed
+ * to be created as a field within fragments and then attached to a RecyclerView when the fragment's view has been
+ * created.
+ *
+ * To construct an instance of the [MviListAdapter] a fragment must be provided so the lifecycle of the view holders
+ * can be managed appropriately.
+ *
+ * ```
+ * val myAdapter = MyAdapter(this)
+ *
+ * override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+ *      super.onViewCreated(view, savedInstanceState)
+ *      recyclerView.adapter = adapter
+ * }
+ * ```
+ */
+abstract class MviListAdapter<T>(fragment: Fragment) : RecyclerView.Adapter<MviListViewHolder<out T>>() {
 
     protected var data: List<T> = emptyList()
         private set
@@ -42,13 +61,16 @@ abstract class MviListAdapter<T>(lifecycleOwner: LifecycleOwner) : RecyclerView.
     private var recyclerView: RecyclerView? = null
 
     init {
-        lifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {
-            @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-            fun onDestroy() {
-                lifecycleOwner.lifecycle.removeObserver(this)
-                subscription?.dispose()
-                destroyViewHolders()
-            }
+        fragment.viewLifecycleOwnerLiveData.observe(fragment, Observer<LifecycleOwner> { owner ->
+            owner.lifecycle.addObserver(object : LifecycleObserver {
+                @Suppress("unused")
+                @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+                fun onDestroy() {
+                    owner.lifecycle.removeObserver(this)
+                    subscription?.dispose()
+                    recyclerView?.adapter = null
+                }
+            })
         })
     }
 
@@ -91,11 +113,10 @@ abstract class MviListAdapter<T>(lifecycleOwner: LifecycleOwner) : RecyclerView.
     @CallSuper
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
         super.onDetachedFromRecyclerView(recyclerView)
-        destroyViewHolders()
         this.recyclerView = null
     }
 
-    override fun getItemCount(): Int = data.size
+    final override fun getItemCount(): Int = data.size
 
     @CallSuper
     override fun onViewAttachedToWindow(holder: MviListViewHolder<out T>) {
@@ -113,12 +134,6 @@ abstract class MviListAdapter<T>(lifecycleOwner: LifecycleOwner) : RecyclerView.
     override fun onViewRecycled(holder: MviListViewHolder<out T>) {
         super.onViewRecycled(holder)
         holder.recycle()
-    }
-
-    private fun destroyViewHolders() {
-        for (index in 0 until data.size) {
-            (recyclerView?.findViewHolderForAdapterPosition(index) as? MviListViewHolder<*>)?.destroy()
-        }
     }
 
     /**

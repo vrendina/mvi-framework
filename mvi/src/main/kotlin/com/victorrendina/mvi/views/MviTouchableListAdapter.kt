@@ -1,13 +1,13 @@
 package com.victorrendina.mvi.views
 
-import androidx.lifecycle.LifecycleOwner
-import androidx.recyclerview.widget.RecyclerView
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.victorrendina.mvi.extensions.moveItem
 import com.victorrendina.mvi.extensions.removeItem
 
-abstract class MviTouchableListAdapter<T>(lifecycleOwner: LifecycleOwner) :
-    MviListAdapter<T>(lifecycleOwner) {
+abstract class MviTouchableListAdapter<T>(fragment: Fragment) :
+    MviListAdapter<T>(fragment) {
 
     open val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
     open val swipeDismissFlags = ItemTouchHelper.START or ItemTouchHelper.END
