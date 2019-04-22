@@ -1,22 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.gridlayout.widget.GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                       android:layout_width="match_parent"
-                                       android:layout_height="match_parent"
-                                       xmlns:app="http://schemas.android.com/apk/res-auto"
-                                       app:columnCount="3">
-
-    <Button
-        android:id="@+id/counterButton"
-        android:layout_width="0dp"
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_columnWeight="1"
-        android:text="Counter" />
+        android:orientation="vertical"
+        android:layout_gravity="center_vertical"
+>
 
-    <Button
-        android:id="@+id/tabsButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_columnWeight="1"
-        android:text="Tabs" />
+    <TextView android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:gravity="center"
+              android:textSize="24sp"
+              android:padding="16dp"
+              android:text="Android Playground"
+    />
 
-</androidx.gridlayout.widget.GridLayout>
+    <androidx.gridlayout.widget.GridLayout
+            android:id="@+id/gridLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:columnCount="3">
+
+        <Button
+                android:id="@+id/counterButton"
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                app:layout_columnWeight="1"
+                app:layout_gravity="top"
+                android:text="Counter"/>
+
+        <Button
+                android:id="@+id/tabsButton"
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                app:layout_columnWeight="1"
+                app:layout_gravity="top"
+                android:text="Tabs"/>
+
+        <Button
+                android:id="@+id/singleSelectionListButton"
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                app:layout_columnWeight="1"
+                app:layout_gravity="top"
+                android:text="Single Selection List"/>
+
+        <Button
+                android:id="@+id/mutliSelectionListButton"
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                app:layout_columnWeight="1"
+                app:layout_gravity="top"
+                android:text="MultiSelection List"/>
+
+    </androidx.gridlayout.widget.GridLayout>
+</LinearLayout>
