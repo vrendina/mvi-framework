@@ -57,6 +57,7 @@ abstract class MviListAdapter<T>(fragment: Fragment) : RecyclerView.Adapter<MviL
 
     // Holds the subscription for the active DiffUtil request
     private var subscription: Disposable? = null
+    private var diffStartTime: Long = 0L
 
     private var recyclerView: RecyclerView? = null
 
@@ -145,6 +146,7 @@ abstract class MviListAdapter<T>(fragment: Fragment) : RecyclerView.Adapter<MviL
         if (itemCount == 0) {
             updateDataImmediate(data)
         } else {
+            diffStartTime = System.currentTimeMillis()
             subscription?.dispose()
             subscription = calculateDiff(MviDiffRequest(this.data, data))
                 .subscribeOn(Schedulers.computation())
@@ -199,6 +201,7 @@ abstract class MviListAdapter<T>(fragment: Fragment) : RecyclerView.Adapter<MviL
 
     private fun updateData(result: MviDiffResult) {
         if (result.oldList === data) {
+            logDiffResult("Diff calculation took ${System.currentTimeMillis() - diffStartTime}ms")
             this.data = result.newList
             result.diff.dispatchUpdatesTo(object : ListUpdateCallback {
                 override fun onChanged(position: Int, count: Int, payload: Any?) {
