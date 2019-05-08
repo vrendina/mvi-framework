@@ -151,7 +151,7 @@ abstract class MviListAdapter<T>(fragment: Fragment) : RecyclerView.Adapter<MviL
                 tag,
                 "Failed to recycle view because animations were not cancelled. Make sure you override cancelAnimations() in your view holder and stop any running animations."
             )
-            holder.itemView.setHasTransientState(true) // make sure transient state isn't cleared
+            holder.setIsRecyclable(false)
             holder.destroy()
             return false
         }
