@@ -37,21 +37,6 @@ class MultiSelectionListViewModel(
         setState {
             copy(items = initialData)
         }
-
-        // Randomly generate some new numbers update the list to test the diff util
-        Observable.interval(5000, TimeUnit.MILLISECONDS)
-            .subscribeOn(Schedulers.io())
-            .map { (0 until initialData.size).map { Random.nextInt() } }
-            .subscribe { randomInts ->
-                // Update each item in the list with a new random number so the diff util runs
-                setState {
-                    copy(items = items.mapIndexed { index: Int, item: SelectableListItem<SampleListItem> ->
-                        item.updateData {
-                            copy(randomInt = randomInts[index])
-                        }
-                    })
-                }
-            }.disposeOnClear()
     }
 
     fun toggleSelection(item: SelectableListItem<SampleListItem>) {

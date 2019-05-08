@@ -33,6 +33,8 @@ class SingleSelectionListFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerView.adapter = adapter
+        recyclerView.setItemViewCacheSize(2)
+        recyclerView.recycledViewPool.setMaxRecycledViews(0, 4)
 
         withState(viewModel) {
             adapter.updateDataImmediate(it.items)
