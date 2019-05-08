@@ -2,6 +2,7 @@ package com.victorrendina.mvi.views
 
 import android.content.Context
 import android.content.res.Resources
+import android.util.Log
 import android.view.View
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -16,6 +17,8 @@ abstract class MviListViewHolder<T>(
 
     protected val context: Context = itemView.context
     protected val resources: Resources = context.resources
+
+    protected val tag: String by lazy { javaClass.simpleName }
 
     @Suppress("LeakingThis")
     private val lifecycleRegistry = LifecycleRegistry(this)
@@ -40,12 +43,11 @@ abstract class MviListViewHolder<T>(
     open val swipeDismissEnabled: Boolean = false
 
     init {
-        lifecycleRegistry.markState(Lifecycle.State.INITIALIZED)
+        lifecycleRegistry.markState(Lifecycle.State.CREATED)
     }
 
     /**
-     * Called when data is bound to the view holder. Your subclass is responsible for providing an implementation.
-     * Any view model subscriptions or RxJava subscriptions should be restarted whenever this method is called.
+     * Called when data is bound to the view holder.
      */
     protected abstract fun onBind(item: T)
 
@@ -53,15 +55,12 @@ abstract class MviListViewHolder<T>(
      * Called when a non-empty change set is used to bind data to the view holder. Your adapter must
      * override getChangeSet to provide a set of changes for this method to be called.
      */
+    @Deprecated("Check if the boundItem is equal to the item in the onBind method instead")
     protected open fun onBind(item: T, changeSet: Set<String>) {
     }
 
     /**
-     * Called when this view holder is recycled. It is impossible to tell if the view holder will be reused
-     * again so any cleanup work should be done in this method, keeping in mind that the view could potentially
-     * still be re-used.
-     *
-     * If you create any RxJava subscriptions they should be disposed of in this method.
+     * Called when this view holder is added to a RecycledViewPool and may be reused.
      */
     protected open fun onRecycle() {
     }
@@ -79,25 +78,33 @@ abstract class MviListViewHolder<T>(
     protected open fun onStop() {
     }
 
-    internal fun bind(item: T) {
-        val lastState = lifecycleRegistry.currentState
-
-        // Clean up any existing subscriptions by recycling this view when re-binding if it hasn't been recycled yet
-        if (lastState != Lifecycle.State.DESTROYED) {
-            recycle()
-        }
-
-        // If the view holder was started restore that state, otherwise we move to created when bound and off screen
-        val updatedState = if (lastState == Lifecycle.State.STARTED) lastState else Lifecycle.State.CREATED
-        lifecycleRegistry.markState(updatedState)
-
-        boundItem = item
-        onBind(item)
+    /**
+     * Called when the view holder is no longer needed because it couldn't be added to a RecyclerView pool or the view has
+     * been destroyed.
+     */
+    protected open fun onDestroy() {
     }
 
-    internal fun bind(item: T, changeSet: Set<String>) {
+    /**
+     * If the view holder is animating when an attempt is made to add it to the recycled view pool this method will be
+     * invoked and the view holder should cancel any running animations so it can be reused.
+     */
+    open fun cancelAnimations() {
+        Log.w(
+            tag,
+            "Recycled view holder while animations were running. Make sure you cancel all animations by overriding cancelAnimations() in your view holder."
+        )
+    }
+
+    internal fun bind(item: T) {
+        onBind(item)
         boundItem = item
+    }
+
+    @Deprecated("Internal method will be removed")
+    internal fun bind(item: T, changeSet: Set<String>) {
         onBind(item, changeSet)
+        boundItem = item
     }
 
     internal fun attach() {
@@ -115,11 +122,14 @@ abstract class MviListViewHolder<T>(
     }
 
     internal fun recycle() {
-        if (lifecycleRegistry.currentState.isAtLeast(Lifecycle.State.CREATED)) {
-            lifecycleRegistry.markState(Lifecycle.State.DESTROYED)
-            onRecycle()
-            boundItem = null
-        }
+        onRecycle()
+        boundItem = null
+    }
+
+    internal fun destroy() {
+        lifecycleRegistry.markState(Lifecycle.State.DESTROYED)
+        boundItem = null
+        onDestroy()
     }
 
     private fun isDestroyed() = lifecycle.currentState == Lifecycle.State.DESTROYED

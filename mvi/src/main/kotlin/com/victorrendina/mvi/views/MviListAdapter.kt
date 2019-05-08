@@ -66,10 +66,12 @@ abstract class MviListAdapter<T>(fragment: Fragment) : RecyclerView.Adapter<MviL
             owner.lifecycle.addObserver(object : LifecycleObserver {
                 @Suppress("unused")
                 @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-                fun onDestroy() {
+                fun onDestroyView() {
                     owner.lifecycle.removeObserver(this)
                     subscription?.dispose()
-                    recyclerView?.adapter = null
+                    val recycledViewPool = recyclerView?.recycledViewPool
+                    recyclerView?.adapter = null // Removing the adapter adds all the view holders to the pool
+                    recycledViewPool?.clear()
                 }
             })
         })
@@ -109,6 +111,10 @@ abstract class MviListAdapter<T>(fragment: Fragment) : RecyclerView.Adapter<MviL
         this.recyclerView = recyclerView
         // Change animations cause views to flash when they are updated and breaks sliders when user is interacting
         (recyclerView.itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
+
+        if (recyclerView.recycledViewPool !is MviRecycledViewPool) {
+            recyclerView.setRecycledViewPool(MviRecycledViewPool())
+        }
     }
 
     @CallSuper
@@ -135,6 +141,11 @@ abstract class MviListAdapter<T>(fragment: Fragment) : RecyclerView.Adapter<MviL
     override fun onViewRecycled(holder: MviListViewHolder<out T>) {
         super.onViewRecycled(holder)
         holder.recycle()
+    }
+
+    final override fun onFailedToRecycleView(holder: MviListViewHolder<out T>): Boolean {
+        holder.cancelAnimations()
+        return true
     }
 
     /**
