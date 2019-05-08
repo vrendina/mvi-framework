@@ -2,6 +2,7 @@ package com.victorrendina.mvi.views
 
 import android.util.Log
 import androidx.annotation.CallSuper
+import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
@@ -145,6 +146,14 @@ abstract class MviListAdapter<T>(fragment: Fragment) : RecyclerView.Adapter<MviL
 
     final override fun onFailedToRecycleView(holder: MviListViewHolder<out T>): Boolean {
         holder.cancelAnimations()
+        if (ViewCompat.hasTransientState(holder.itemView)) {
+            Log.e(
+                tag,
+                "Failed to recycle view because animations were not cancelled. Make sure you override cancelAnimations() in your view holder and stop any running animations."
+            )
+            holder.destroy()
+            return false
+        }
         return true
     }
 

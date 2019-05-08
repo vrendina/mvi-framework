@@ -2,7 +2,6 @@ package com.victorrendina.mvi.views
 
 import android.content.Context
 import android.content.res.Resources
-import android.util.Log
 import android.view.View
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -90,10 +89,6 @@ abstract class MviListViewHolder<T>(
      * invoked and the view holder should cancel any running animations so it can be reused.
      */
     open fun cancelAnimations() {
-        Log.w(
-            tag,
-            "Recycled view holder while animations were running. Make sure you cancel all animations by overriding cancelAnimations() in your view holder."
-        )
     }
 
     internal fun bind(item: T) {
