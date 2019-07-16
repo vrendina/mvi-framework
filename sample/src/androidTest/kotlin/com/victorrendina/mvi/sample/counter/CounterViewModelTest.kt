@@ -1,6 +1,5 @@
 package com.victorrendina.mvi.sample.counter
 
-import android.util.Log
 import com.victorrendina.mvi.sample.BaseAndroidTest
 import com.victorrendina.mvi.withState
 import org.junit.Assert.assertTrue
