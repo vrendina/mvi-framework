@@ -8,31 +8,23 @@ import io.reactivex.exceptions.CompositeException
 import io.reactivex.internal.schedulers.ExecutorScheduler
 import io.reactivex.plugins.RxJavaPlugins
 import org.junit.BeforeClass
-import org.junit.Ignore
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
-import org.robolectric.shadows.ShadowLog
 import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
 
-@RunWith(RobolectricTestRunner::class)
-@Config(application = UnitTestSampleApplication::class)
-@Ignore
-abstract class BaseAndroidUnitTest {
+abstract class BaseAndroidTest {
+
     companion object {
+
         @JvmStatic
         @BeforeClass
-        fun classSetUp() {
-            ShadowLog.stream = System.out
-            RxAndroidPlugins.reset()
+        fun classSetup() {
             RxJavaPlugins.reset()
             val immediate = object : Scheduler() {
                 // this prevents StackOverflowErrors when scheduling with a delay
                 override fun scheduleDirect(@NonNull run: Runnable, delay: Long, @NonNull unit: TimeUnit): Disposable =
                     super.scheduleDirect(run, 0, unit)
 
-                override fun createWorker(): Scheduler.Worker = ExecutorScheduler.ExecutorWorker(Executor { it.run() })
+                override fun createWorker() = ExecutorScheduler.ExecutorWorker(Executor { it.run() })
             }
             RxJavaPlugins.setInitNewThreadSchedulerHandler { immediate }
             RxJavaPlugins.setInitComputationSchedulerHandler { immediate }
@@ -42,6 +34,7 @@ abstract class BaseAndroidUnitTest {
             // This is necessary to prevent rxjava from swallowing errors
             // https://github.com/ReactiveX/RxJava/issues/5234
             Thread.setDefaultUncaughtExceptionHandler { _, e ->
+                println("Uncaught exception handler called!")
                 if (e is CompositeException && e.exceptions.size == 1) throw e.exceptions[0]
                 throw e
             }

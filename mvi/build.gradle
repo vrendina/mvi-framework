@@ -44,6 +44,4 @@ dependencies {
     api deps.androidx.lifecycle.extensions
     kapt deps.androidx.lifecycle.compiler
     
-    testImplementation deps.robolectric.core
-    testImplementation deps.robolectric.shadows
 }
