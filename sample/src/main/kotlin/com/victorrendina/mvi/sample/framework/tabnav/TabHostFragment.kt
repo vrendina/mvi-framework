@@ -122,10 +122,9 @@ abstract class TabHostFragment : BaseFragment() {
     }
 
     override fun onBackPressed(): Boolean {
-        childFragmentManager.fragments.forEach { fragment ->
-            if (fragment is TabRootFragment && fragment.isVisible) {
-                return fragment.goBack()
-            }
+        val currentFragment = childFragmentManager.fragments.getOrNull(tabNavViewPager.currentItem)
+        if (currentFragment is TabRootFragment) {
+            return currentFragment.goBack()
         }
         return false
     }
