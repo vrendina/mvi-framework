@@ -214,6 +214,20 @@ abstract class BaseMviViewModel<S : MviState, A : MviArgs>(
         subscriber: (P) -> Unit
     ) = selectSubscribeInternal(null, prop1, subscriber)
 
+    protected fun <P, V> selectSubscribe(
+        prop1: KProperty1<S, P>,
+        mapper: (P) -> V?,
+        subscriber: (V) -> Unit
+    ) = selectSubscribeInternal(null, prop1, mapper, subscriber)
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    fun <P, V> selectSubscribe(
+        owner: LifecycleOwner,
+        prop1: KProperty1<S, P>,
+        mapper: (P) -> V?,
+        subscriber: (V) -> Unit
+    ) = selectSubscribeInternal(owner, prop1, mapper, subscriber)
+
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     fun <P> selectSubscribe(
         owner: LifecycleOwner,
@@ -229,6 +243,18 @@ abstract class BaseMviViewModel<S : MviState, A : MviArgs>(
         .map { MviTuple1(prop1.get(it)) }
         .distinctUntilChanged()
         .subscribeLifecycle(owner) { (p) -> subscriber(p) }
+
+    private fun <P, V> selectSubscribeInternal(
+        owner: LifecycleOwner?,
+        prop1: KProperty1<S, P>,
+        mapper: (P) -> V?,
+        subscriber: (V) -> Unit
+    ) = stateStore.observable
+        .map { MviTuple1(prop1.get(it)) }
+        .map { (p) -> MviTuple1(mapper(p)) }
+        .filter { (v) -> v != null }
+        .distinctUntilChanged()
+        .subscribeLifecycle(owner) { (p) -> subscriber(p!!) }
 
     /**
      * Subscribe to changes in an async property. There are optional parameters for onSuccess
