@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IdRes
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import com.victorrendina.mvi.MviArgs
 import com.victorrendina.mvi.extensions.args
 import com.victorrendina.mvi.sample.R
@@ -22,6 +24,18 @@ class TabRootFragment : BaseFragment(), TabNavHost {
 
     private val tabHost: TabHostFragment
         get() = parentFragment as TabHostFragment
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Notify all child fragment tabs when their view is created which tab is currently selected
+        childFragmentManager.registerFragmentLifecycleCallbacks(object : FragmentManager.FragmentLifecycleCallbacks() {
+            override fun onFragmentViewCreated(fm: FragmentManager, f: Fragment, v: View, savedInstanceState: Bundle?) {
+                if (f is BaseFragment) {
+                    f.onTabSelected(getCurrentTab())
+                }
+            }
+        }, false)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_tab_root, container, false)

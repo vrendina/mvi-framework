@@ -35,18 +35,6 @@ abstract class TabHostFragment : BaseFragment() {
         TabNavAdapter(childFragmentManager)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        // Notify all child fragment tabs when their view is created which tab is currently selected
-        childFragmentManager.registerFragmentLifecycleCallbacks(object : FragmentManager.FragmentLifecycleCallbacks() {
-            override fun onFragmentViewCreated(fm: FragmentManager, f: Fragment, v: View, savedInstanceState: Bundle?) {
-                if (f is BaseFragment) {
-                    f.onTabSelected(getCurrentTab())
-                }
-            }
-        }, false)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_tab_navigation, container, false)
     }
