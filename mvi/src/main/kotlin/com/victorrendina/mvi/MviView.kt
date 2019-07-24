@@ -29,6 +29,15 @@ interface MviView : LifecycleOwner {
     ) = selectSubscribe(this@MviView, prop1, subscriber)
 
     /**
+     * Subscribes to state changes for the result of a mapper on a specific property and calls the subscribe with
+     * only that single property.
+     */
+    fun <S : MviState, A : MviArgs, P, V> BaseMviViewModel<S, A>.selectSubscribe(
+        prop1: KProperty1<S, P>,
+        mapper: (P) -> V?,
+        subscriber: (V) -> Unit
+    ) = selectSubscribe(this@MviView, prop1, mapper, subscriber)
+    /**
      * Subscribe to changes in an async property. There are optional parameters for onSuccess
      * and onFail which automatically unwrap the value or error.
      */
