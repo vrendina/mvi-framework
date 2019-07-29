@@ -6,8 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IdRes
 import androidx.annotation.MenuRes
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.viewpager.widget.ViewPager
 import com.victorrendina.mvi.sample.R
 import com.victorrendina.mvi.sample.framework.BaseFragment
@@ -42,7 +40,7 @@ abstract class TabHostFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupBottomNavigation()
-        setupScreens()
+        notifyMenuChanged()
         setupViewPager()
     }
 
@@ -73,7 +71,7 @@ abstract class TabHostFragment : BaseFragment() {
     /**
      * Create the list of fragments for each menu item by associating each menu item id with a fragment class.
      */
-    private fun setupScreens() {
+    fun notifyMenuChanged() {
         val data: ArrayList<TabRootItem> = ArrayList()
         val menu = bottomNavigation.menu
         for (index in 0 until menu.size()) {
