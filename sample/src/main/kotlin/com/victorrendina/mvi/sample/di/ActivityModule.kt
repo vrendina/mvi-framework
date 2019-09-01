@@ -2,6 +2,7 @@ package com.victorrendina.mvi.sample.di
 
 import com.victorrendina.mvi.sample.LaunchActivity
 import com.victorrendina.mvi.sample.framework.BaseFragmentActivity
+import com.victorrendina.mvi.sample.framework.BaseFragmentSlidingActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -16,4 +17,7 @@ abstract class ActivityModule {
 
     @ContributesAndroidInjector
     abstract fun fragmentActivity(): BaseFragmentActivity
+
+    @ContributesAndroidInjector
+    abstract fun fragmentSlidingActivity(): BaseFragmentSlidingActivity
 }

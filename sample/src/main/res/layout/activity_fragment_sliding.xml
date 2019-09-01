@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.victorrendina.mvi.sample.framework.slider.SimpleSlideDownLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/slidingDownLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <ImageView
+                android:id="@+id/backgroundImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@null"
+                android:scaleType="centerCrop"
+                android:src="@android:color/white"/>
+
+        <FrameLayout
+                android:id="@+id/container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fitsSystemWindows="true"/>
+
+        <ImageView
+                android:id="@+id/statusBarBackground"
+                android:src="@color/colorPrimary"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_gravity="top"
+                android:contentDescription="@null"
+                android:visibility="gone"
+        />
+
+        <ImageView
+                android:id="@+id/navigationBarBackground"
+                android:src="@color/colorAccent"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_gravity="bottom"
+                android:contentDescription="@null"
+                android:visibility="gone"
+        />
+
+    </FrameLayout>
+
+</com.victorrendina.mvi.sample.framework.slider.SimpleSlideDownLayout>

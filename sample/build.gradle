@@ -11,6 +11,7 @@ android {
         applicationId "com.victorrendina.mvi.sample"
         minSdkVersion versions.minSdk
         targetSdkVersion versions.targetSdk
+        multiDexEnabled true
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "com.victorrendina.mvi.sample.SampleTestRunner"
@@ -79,6 +80,10 @@ dependencies {
 
     debugImplementation deps.leakCanary.op
     releaseImplementation deps.leakCanary.noop
+
+    implementation deps.androidx.ktx.core
+
+    implementation deps.androidx.multidex
 
     androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'

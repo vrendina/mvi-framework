@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.victorrendina.mvi.extensions.moveItem
 import com.victorrendina.mvi.extensions.removeItem
 
-abstract class MviTouchableListAdapter<T>(fragment: Fragment) :
+abstract class MviTouchableListAdapter<T: Any>(fragment: Fragment) :
     MviListAdapter<T>(fragment) {
 
     open val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN

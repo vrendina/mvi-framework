@@ -35,7 +35,7 @@ import io.reactivex.schedulers.Schedulers
  * }
  * ```
  */
-abstract class MviListAdapter<T>(fragment: Fragment) : RecyclerView.Adapter<MviListViewHolder<out T>>() {
+abstract class MviListAdapter<T: Any>(fragment: Fragment) : RecyclerView.Adapter<MviListViewHolder<out T>>() {
 
     protected var data: List<T> = emptyList()
         private set
@@ -70,9 +70,22 @@ abstract class MviListAdapter<T>(fragment: Fragment) : RecyclerView.Adapter<MviL
                 fun onDestroyView() {
                     owner.lifecycle.removeObserver(this)
                     subscription?.dispose()
-                    val recycledViewPool = recyclerView?.recycledViewPool
-                    recyclerView?.adapter = null // Removing the adapter adds all the view holders to the pool
-                    recycledViewPool?.clear()
+
+                    val recyclerView = recyclerView
+                    if (recyclerView != null) {
+                        for (index in 0 until data.size) {
+                            val viewHolder = recyclerView.findViewHolderForAdapterPosition(index)
+                            if (viewHolder != null) {
+                                // Prevent the view holders that are currently on the screen from being put in the pool
+                                recyclerView.layoutManager?.ignoreView(viewHolder.itemView)
+                                (viewHolder as? MviListViewHolder<*>)?.destroy()
+                            }
+                        }
+
+                        recyclerView.itemAnimator?.endAnimations()
+                        recyclerView.adapter = null // Removing the adapter adds all the view holders to the pool
+                        recyclerView.recycledViewPool.clear() // Destroy any remaining items in the pool
+                    }
                 }
             })
         })
@@ -197,7 +210,7 @@ abstract class MviListAdapter<T>(fragment: Fragment) : RecyclerView.Adapter<MviL
      * @return true if ids match or don't exist, false if ids are different
      */
     open fun areItemsTheSame(oldItem: T, newItem: T): Boolean {
-        return true
+        return oldItem::class == newItem::class
     }
 
     open fun areContentsTheSame(oldItem: T, newItem: T): Boolean {

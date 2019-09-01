@@ -10,14 +10,25 @@
             android:name=".MviSampleApplication"
             android:theme="@style/AppTheme"
             tools:ignore="GoogleAppIndexingWarning,MissingApplicationIcon">
-        <activity android:name="com.victorrendina.mvi.sample.LaunchActivity">
+
+        <activity
+                android:name="com.victorrendina.mvi.sample.LaunchActivity"
+                android:theme="@style/AppTheme.TranslucentDecor"
+        >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
-        <activity android:name=".framework.BaseFragmentActivity"/>
+        <activity android:name=".framework.BaseFragmentActivity"
+                  android:theme="@style/AppTheme.TranslucentDecor"
+        />
+
+        <activity android:name=".framework.BaseFragmentSlidingActivity"
+                  android:theme="@style/AppTheme.TranslucentDecor.Transparent"
+        />
+
     </application>
 
 </manifest>

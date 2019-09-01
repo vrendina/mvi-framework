@@ -100,6 +100,7 @@ abstract class TabHostFragment : BaseFragment() {
      */
     private fun notifyTabSelected() {
         val currentTab = getCurrentTab()
+        onTabSelected(currentTab)
         childFragmentManager.fragments.forEach { fragment ->
             if (fragment is BaseFragment && fragment.view != null) {
                 fragment.onTabSelected(currentTab)
@@ -108,7 +109,9 @@ abstract class TabHostFragment : BaseFragment() {
     }
 
     override fun onBackPressed(): Boolean {
-        val currentFragment = childFragmentManager.fragments.getOrNull(tabNavViewPager.currentItem)
+        val currentFragment = childFragmentManager.fragments.firstOrNull {
+            adapter.getItemPosition(it) == tabNavViewPager.currentItem
+        }
         if (currentFragment is TabRootFragment) {
             return currentFragment.goBack()
         }

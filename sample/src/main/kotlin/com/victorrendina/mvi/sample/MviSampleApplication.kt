@@ -1,6 +1,8 @@
 package com.victorrendina.mvi.sample
 
+import android.content.Context
 import android.os.Looper
+import androidx.multidex.MultiDex
 import com.squareup.leakcanary.LeakCanary
 import com.victorrendina.mvi.sample.di.DaggerAppComponent
 import dagger.android.AndroidInjector
@@ -16,6 +18,11 @@ open class MviSampleApplication : DaggerApplication() {
 
         val asyncMainThreadScheduler = AndroidSchedulers.from(Looper.getMainLooper(), true)
         RxAndroidPlugins.setInitMainThreadSchedulerHandler { asyncMainThreadScheduler }
+    }
+
+    override fun attachBaseContext(base: Context?) {
+        super.attachBaseContext(base)
+        MultiDex.install(this)
     }
 
     open fun installLeakCanary() {

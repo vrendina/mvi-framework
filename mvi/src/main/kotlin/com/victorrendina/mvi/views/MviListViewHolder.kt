@@ -19,8 +19,7 @@ abstract class MviListViewHolder<T>(
 
     protected val tag: String by lazy { javaClass.simpleName }
 
-    @Suppress("LeakingThis")
-    private val lifecycleRegistry = LifecycleRegistry(this)
+    private val lifecycleRegistry by lazy { LifecycleRegistry(this) }
 
     /**
      * The item that is currently bound to this view holder. This field will be non-null as long as the view holder is
@@ -123,7 +122,6 @@ abstract class MviListViewHolder<T>(
 
     internal fun destroy() {
         lifecycleRegistry.markState(Lifecycle.State.DESTROYED)
-        boundItem = null
         onDestroy()
     }
 

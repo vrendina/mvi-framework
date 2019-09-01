@@ -54,5 +54,21 @@
                 app:layout_gravity="top"
                 android:text="MultiSelection List"/>
 
+        <Button
+                android:id="@+id/slidingButton"
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                app:layout_columnWeight="1"
+                app:layout_gravity="top"
+                android:text="Sliding Views"/>
+
+        <Button
+                android:id="@+id/finishButton"
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                app:layout_columnWeight="1"
+                app:layout_gravity="top"
+                android:text="Activity Finish"/>
+
     </androidx.gridlayout.widget.GridLayout>
 </LinearLayout>

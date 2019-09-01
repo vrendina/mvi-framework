@@ -6,8 +6,10 @@ import com.victorrendina.mvi.annotations.MviViewModelModule
 import com.victorrendina.mvi.di.InjectableViewModelFactory
 import com.victorrendina.mvi.di.ViewModelKey
 import com.victorrendina.mvi.sample.counter.CounterViewModel
+import com.victorrendina.mvi.sample.framework.autofinish.AutoFinishViewModel
 import com.victorrendina.mvi.sample.lists.multi.MultiSelectionListViewModel
 import com.victorrendina.mvi.sample.lists.single.SingleSelectionListViewModel
+import com.victorrendina.mvi.sample.sliding.SampleSlidingViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
@@ -35,5 +37,14 @@ abstract class ViewModelModule {
     @ViewModelKey(MultiSelectionListViewModel::class)
     abstract fun multiSelectionFactory(factory: MultiSelectionListViewModel.Factory): InjectableViewModelFactory<out BaseMviViewModel<*, *>, *, *>
 
+    @Binds
+    @IntoMap
+    @ViewModelKey(SampleSlidingViewModel::class)
+    abstract fun slidingFactory(factory: SampleSlidingViewModel.Factory): InjectableViewModelFactory<out BaseMviViewModel<*, *>, *, *>
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(AutoFinishViewModel::class)
+    abstract fun autoFinishFactory(factory: AutoFinishViewModel.Factory): InjectableViewModelFactory<out BaseMviViewModel<*, *>, *, *>
 
 }

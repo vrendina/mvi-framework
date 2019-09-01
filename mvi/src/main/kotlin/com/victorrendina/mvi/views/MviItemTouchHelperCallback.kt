@@ -45,6 +45,16 @@ open class MviItemTouchHelperCallback(
         }
     }
 
+    override fun getAnimationDuration(
+        recyclerView: RecyclerView,
+        animationType: Int,
+        animateDx: Float,
+        animateDy: Float
+    ): Long {
+        // TODO Need sample project that illustrates the [clearView] crash.
+        return 5000
+    }
+
     override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
         super.clearView(recyclerView, viewHolder)
         adapter.onTouchComplete(viewHolder)

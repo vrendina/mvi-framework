@@ -5,7 +5,7 @@ import com.victorrendina.mvi.MviArgs
 import com.victorrendina.mvi.MviState
 import com.victorrendina.mvi.annotations.MviViewModel
 import com.victorrendina.mvi.di.InjectableViewModelFactory
-import com.victorrendina.mvi.sample.framework.BaseViewModel
+import com.victorrendina.mvi.sample.framework.BaseViewModelArgs
 import kotlinx.android.parcel.Parcelize
 import javax.inject.Inject
 
@@ -23,7 +23,7 @@ data class CounterViewState(val count: Int = 0) : MviState {
 class CounterViewModel(
     initialState: CounterViewState,
     arguments: CounterArgs?
-) : BaseViewModel<CounterViewState, CounterArgs>(initialState, arguments) {
+) : BaseViewModelArgs<CounterViewState, CounterArgs>(initialState, arguments) {
 
     init {
         logStateChanges()
@@ -50,6 +50,5 @@ class CounterViewModel(
         override fun create(initialState: CounterViewState, arguments: CounterArgs?): CounterViewModel {
             return CounterViewModel(initialState, arguments)
         }
-
     }
 }

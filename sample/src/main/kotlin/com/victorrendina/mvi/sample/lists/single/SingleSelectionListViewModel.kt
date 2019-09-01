@@ -5,7 +5,7 @@ import com.victorrendina.mvi.MviArgs
 import com.victorrendina.mvi.MviState
 import com.victorrendina.mvi.annotations.MviViewModel
 import com.victorrendina.mvi.di.InjectableViewModelFactory
-import com.victorrendina.mvi.sample.framework.BaseViewModel
+import com.victorrendina.mvi.sample.framework.BaseViewModelArgs
 import com.victorrendina.mvi.sample.lists.SampleListItem
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
@@ -22,7 +22,7 @@ data class SingleSelectionListViewState(
 @MviViewModel
 class SingleSelectionListViewModel(
     initialState: SingleSelectionListViewState
-) : BaseViewModel<SingleSelectionListViewState, MviArgs>(initialState, null) {
+) : BaseViewModelArgs<SingleSelectionListViewState, MviArgs>(initialState, null) {
 
     init {
         val initialData = (0 until 5000).map {

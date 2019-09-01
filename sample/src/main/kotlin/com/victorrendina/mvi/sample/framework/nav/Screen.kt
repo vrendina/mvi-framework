@@ -10,7 +10,22 @@ import androidx.fragment.app.Fragment
 import com.victorrendina.mvi.Mvi
 import com.victorrendina.mvi.MviArgs
 import com.victorrendina.mvi.sample.R
+import com.victorrendina.mvi.sample.framework.BaseFragmentSlidingActivity
 import kotlinx.android.parcel.Parcelize
+import java.lang.IllegalArgumentException
+
+/**
+ * Data class used to navigate between screens within the application. The constructor should not be used directly,
+ * instead use a ScreenBuilder from Java or the [screen] extension function from Kotlin.
+ *
+ * For example:
+ * ```
+ * nav.pushScreen(screen(MyFragment::class.java) {
+ *      arguments = MyArgs(true)
+ * })
+ *```
+ *
+ */
 
 @Parcelize
 data class Screen(
@@ -32,9 +47,22 @@ data class Screen(
      * will be added automatically.
      */
     fun startActivity(context: Context) {
+        context.startActivity(buildIntent(context))
+    }
+
+    /**
+     * Start a new activity from the screen definition for a result with the target fragment.
+     *
+     * @param target fragment that will receive the activity result
+     * @param requestCode code to track this request
+     */
+    fun startActivityForResult(target: Fragment, requestCode: Int) {
+        target.startActivityForResult(buildIntent(target.requireActivity()), requestCode)
+    }
+
+    private fun buildIntent(context: Context): Intent {
         if (activity != null) {
-            val activity = Class.forName(activity)
-            val intent = Intent(context, activity).apply {
+            return Intent(context, Class.forName(activity)).apply {
                 putExtra(KEY_SCREEN, this@Screen)
                 if (arguments != null) {
                     putExtra(Mvi.KEY_ARG, arguments)
@@ -43,8 +71,8 @@ data class Screen(
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 }
             }
-            context.startActivity(intent)
         }
+        throw IllegalArgumentException("Attempted to start activity without activity set in screen")
     }
 
     /**
@@ -74,6 +102,14 @@ class ScreenBuilder(val fragment: Class<out Fragment>) {
     var backStackTag: String = fragment.simpleName
 
     var activity: Class<out Activity>? = null
+        set(value) {
+            field = value
+            // If the activity is a sliding activity then change the default animations
+            if (value != null && BaseFragmentSlidingActivity::class.java.isAssignableFrom(value)) {
+                enterAnimation = R.anim.slide_in_bottom_fast
+                popExitAnimation = R.anim.slide_out_bottom_fast
+            }
+        }
 
     @AnimRes
     var enterAnimation: Int = R.anim.slide_in_right

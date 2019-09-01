@@ -1,6 +1,5 @@
 package com.victorrendina.mvi.sample.lists.multi
 
-import android.util.Log
 import com.victorrendina.mvi.MviArgs
 import com.victorrendina.mvi.MviState
 import com.victorrendina.mvi.annotations.MviViewModel
@@ -8,14 +7,10 @@ import com.victorrendina.mvi.di.InjectableViewModelFactory
 import com.victorrendina.mvi.extensions.moveItem
 import com.victorrendina.mvi.extensions.removeItem
 import com.victorrendina.mvi.extensions.updateItems
-import com.victorrendina.mvi.sample.framework.BaseViewModel
+import com.victorrendina.mvi.sample.framework.BaseViewModelArgs
 import com.victorrendina.mvi.sample.lists.SampleListItem
 import com.victorrendina.mvi.views.SelectableListItem
-import io.reactivex.Observable
-import io.reactivex.schedulers.Schedulers
-import java.util.Collections
 import java.util.UUID
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -26,7 +21,7 @@ data class MultiSelectionListViewState(
 @MviViewModel
 class MultiSelectionListViewModel(
     initialState: MultiSelectionListViewState
-) : BaseViewModel<MultiSelectionListViewState, MviArgs>(initialState, null) {
+) : BaseViewModelArgs<MultiSelectionListViewState, MviArgs>(initialState, null) {
 
     init {
         val initialData = (0 until 1000).map {

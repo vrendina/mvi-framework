@@ -4,16 +4,17 @@ import android.os.Bundle
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.ImageView
 import androidx.annotation.CallSuper
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import com.victorrendina.mvi.Mvi
 import com.victorrendina.mvi.MviArgs
 import com.victorrendina.mvi.MviView
+import com.victorrendina.mvi.sample.framework.autofinish.AutoFinishHost
 import com.victorrendina.mvi.sample.framework.dialog.BaseDialogFragment
 import com.victorrendina.mvi.sample.framework.nav.NavHost
 import com.victorrendina.mvi.sample.framework.nav.getScreen
+import com.victorrendina.mvi.sample.framework.slider.SlideDownHost
 import com.victorrendina.mvi.sample.framework.tabnav.TabNavHost
 import com.victorrendina.mvi.sample.framework.tabnav.TabRootItem
 
@@ -34,8 +35,24 @@ abstract class BaseFragment : Fragment(), MviView {
             ?: throw IllegalStateException("To use tab navigation your fragment must be hosted in a parent fragment that implements 'TabNavHost'")
     }
 
-    protected val backgroundImage: ImageView?
-        get() = (activity as? BaseFragmentActivity)?.getBackgroundImage()
+    /**
+     * If your fragment is hosted within a transparent sliding activity, the slider can be used to
+     * set the drag view, disable dragging, or get the current drag state.
+     */
+    protected val slider: SlideDownHost by lazy(mode = LazyThreadSafetyMode.NONE) {
+        activity as? SlideDownHost
+            ?: throw IllegalStateException("To use sliding in your fragment the host activity must implement 'SlideDownHost'")
+    }
+
+    protected val background by lazy(mode = LazyThreadSafetyMode.NONE) {
+        activity as? BackgroundHost
+            ?: throw IllegalStateException("To use the activity background in your fragment the activity must implement 'BackgroundHost'")
+    }
+
+    protected val autoFinish by lazy(mode = LazyThreadSafetyMode.NONE) {
+        activity as? AutoFinishHost
+            ?: throw IllegalStateException("To use auto finish in your fragment the activity must implement 'AutoFinishHost'")
+    }
 
     /**
      * Create and show a new dialog fragment that is a child fragment of the current fragment and attach
@@ -134,5 +151,4 @@ abstract class BaseFragment : Fragment(), MviView {
     companion object {
         private const val SUPPRESS_CHILD_ANIMATIONS_KEY = "suppress_child_animations"
     }
-
 }

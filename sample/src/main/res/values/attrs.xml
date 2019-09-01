@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="SwipeRevealLayout">
-        <attr name="srl_dragEdge">
-            <flag name="left" value="1" />
-            <flag name="right" value="2" />
+    <declare-styleable name="SimpleSlideDownLayout">
+        <attr name="ssdShadowHeight" format="dimension" />
+        <attr name="ssdFadeColor" format="color" />
+        <attr name="ssdFlingVelocity" format="integer" />
+        <attr name="ssdDragView" format="reference" />
+        <attr name="ssdTouchEnabled" format="boolean" />
+        <attr name="ssdInitialState" format="enum">
+            <enum name="expanded" value="0" />
+            <enum name="collapsed" value="1" />
+            <enum name="hidden" value="2" />
         </attr>
-
-        <attr name="srl_mode">
-            <enum name="edge" value="0" />
-            <enum name="under" value="1" />
-        </attr>
-
-        <attr name="srl_flingVelocity" format="integer" />
+        <attr name="ssdScrollInterpolator" format="reference" />
     </declare-styleable>
 </resources>
