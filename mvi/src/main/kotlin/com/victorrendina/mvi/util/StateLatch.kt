@@ -39,7 +39,7 @@ import io.reactivex.schedulers.Schedulers
  * this operates on the IO scheduler.
  * @param listener Method that will be called when a state update is received or when the
  * state is being restored to the previous value. This listener should be used to update the
- * user interface or in your call setState {} in your ViewModel to update the view state.
+ * user interface or call setState {} in your ViewModel to update the view state.
  */
 class StateLatch<T>(
     restoreDelay: Long = DEFAULT_RESTORE_DELAY,

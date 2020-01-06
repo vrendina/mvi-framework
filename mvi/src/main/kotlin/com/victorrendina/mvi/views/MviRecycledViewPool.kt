@@ -35,5 +35,4 @@ class MviRecycledViewPool : RecyclerView.RecycledViewPool() {
         }
         super.clear()
     }
-
 }

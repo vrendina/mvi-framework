@@ -2,12 +2,10 @@ package com.victorrendina.mvi.util
 
 import com.victorrendina.mvi.util.StateLatch.Companion.DEFAULT_RESTORE_DELAY
 import com.victorrendina.mvi.util.StateLatch.Companion.DEFAULT_SEND_INTERVAL
-import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.PublishSubject
 import java.util.concurrent.ConcurrentHashMap
 
 class CompositeStateLatch<K, V>(
@@ -18,21 +16,10 @@ class CompositeStateLatch<K, V>(
     private val listener: ((key: K, value: V) -> Unit)? = null
 ) : Disposable {
 
-    private val subject: PublishSubject<Pair<K, V>> = PublishSubject.create()
     private val latches = ConcurrentHashMap<K, StateLatch<V>>()
 
     @Volatile
     private var disposed = false
-
-    fun observeState(): Observable<Pair<K, V>> = subject.startWith(Observable.create {
-        latches.forEach { (key, latch) ->
-            val currentState = latch.getState()
-            if (currentState != null) {
-                it.onNext(key to currentState)
-            }
-        }
-        it.onComplete()
-    })
 
     fun setState(key: K, value: V) {
         if (!isDisposed) {
@@ -81,7 +68,6 @@ class CompositeStateLatch<K, V>(
     private fun createLatch(key: K): StateLatch<V> {
         return StateLatch(restoreDelay, sendInterval, restoreScheduler, sendScheduler) { value ->
             listener?.invoke(key, value)
-            subject.onNext(key to value)
         }
     }
 

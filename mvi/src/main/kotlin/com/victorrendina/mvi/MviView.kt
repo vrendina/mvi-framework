@@ -37,6 +37,7 @@ interface MviView : LifecycleOwner {
         mapper: (P) -> V?,
         subscriber: (V) -> Unit
     ) = selectSubscribe(this@MviView, prop1, mapper, subscriber)
+
     /**
      * Subscribe to changes in an async property. There are optional parameters for onSuccess
      * and onFail which automatically unwrap the value or error.
