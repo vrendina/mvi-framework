@@ -1,11 +1,11 @@
 package com.victorrendina.mvi.extensions
 
 import android.app.Activity
-import androidx.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.ViewModelProviders
 import com.victorrendina.mvi.BaseMviViewModel
 import com.victorrendina.mvi.LifecycleAwareLazy
 import com.victorrendina.mvi.Mvi
@@ -20,9 +20,10 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
 inline fun <T, reified VM : BaseMviViewModel<S, A>, reified S : MviState, reified A : MviArgs> T.viewModel(
-    viewModelClass: KClass<VM> = VM::class
+    viewModelClass: KClass<VM> = VM::class,
+    noinline argumentProvider: (() -> A)? = null
 ) where T : Fragment, T : MviView = LifecycleAwareLazy(this) {
-    val arguments: A? = getFragmentArgs()
+    val arguments: A? = argumentProvider?.invoke() ?: getFragmentArgs()
     val initialState: S = _initialStateProvider(arguments)
 
     val factory = MviViewModelProviderFactory {
@@ -32,9 +33,10 @@ inline fun <T, reified VM : BaseMviViewModel<S, A>, reified S : MviState, reifie
 }
 
 inline fun <T, reified VM : BaseMviViewModel<S, A>, reified S : MviState, reified A : MviArgs> T.activityViewModel(
-    viewModelClass: KClass<VM> = VM::class
+    viewModelClass: KClass<VM> = VM::class,
+    noinline argumentProvider: (() -> A)? = null
 ) where T : Fragment, T : MviView = LifecycleAwareLazy(this) {
-    val arguments: A? = getActivityArgs()
+    val arguments: A? = argumentProvider?.invoke() ?: getActivityArgs()
     val initialState: S = _initialStateProvider(arguments)
 
     val factory = MviViewModelProviderFactory {
@@ -44,10 +46,11 @@ inline fun <T, reified VM : BaseMviViewModel<S, A>, reified S : MviState, reifie
 }
 
 inline fun <T, reified VM : BaseMviViewModel<S, A>, reified S : MviState, reified A : MviArgs> T.viewModel(
-    viewModelClass: KClass<VM> = VM::class
+    viewModelClass: KClass<VM> = VM::class,
+    noinline argumentProvider: (() -> A)? = null
 ) where T : FragmentActivity, T : MviViewModelFactoryOwner, T : MviView =
     LifecycleAwareLazy(this) {
-        val arguments: A? = getArgs()
+        val arguments: A? = argumentProvider?.invoke() ?: getArgs()
         val initialState: S = _initialStateProvider(arguments)
 
         val factory = MviViewModelProviderFactory {
@@ -57,9 +60,10 @@ inline fun <T, reified VM : BaseMviViewModel<S, A>, reified S : MviState, reifie
     }
 
 inline fun <T, reified VM : BaseMviViewModel<S, A>, reified S : MviState, reified A : MviArgs> T.parentViewModel(
-        viewModelClass: KClass<VM> = VM::class
+    viewModelClass: KClass<VM> = VM::class,
+    noinline argumentProvider: (() -> A)? = null
 ) where T : Fragment, T : MviView = LifecycleAwareLazy(this) {
-    val arguments: A? = getParentFragmentArgs()
+    val arguments: A? = argumentProvider?.invoke() ?: getParentFragmentArgs()
     val initialState: S = _initialStateProvider(arguments)
 
     val factory = MviViewModelProviderFactory {
@@ -78,7 +82,7 @@ inline fun <reified A : MviArgs> Activity.getArgs(): A? {
     return intent?.extras?.get(Mvi.KEY_ARG) as? A
 }
 
-inline fun <reified A : MviArgs> Fragment.getParentFragmentArgs() : A? = parentFragment?.arguments?.get(Mvi.KEY_ARG) as? A
+inline fun <reified A : MviArgs> Fragment.getParentFragmentArgs(): A? = parentFragment?.arguments?.get(Mvi.KEY_ARG) as? A
 
 fun Fragment.getViewModelFactory(): MviViewModelFactory {
     return (requireActivity() as? MviViewModelFactoryOwner)?.viewModelFactory
@@ -106,7 +110,7 @@ fun Fragment.addArguments(args: MviArgs): Fragment {
  * Where `MyArgumentsType` is the parcelable class implementing MviArgs and containing your arguments that were
  * provided to the fragment under the key [Mvi.KEY_ARG].
  */
-fun <V : MviArgs> args() = object: ReadOnlyProperty<Fragment, V> {
+fun <V : MviArgs> args() = object : ReadOnlyProperty<Fragment, V> {
 
     var value: V? = null
 
@@ -119,6 +123,24 @@ fun <V : MviArgs> args() = object: ReadOnlyProperty<Fragment, V> {
             value = argsUntyped as V
         }
         return value!!
+    }
+}
+
+/**
+ * Property delegate to obtain optional Mvi arguments in fragments.
+ */
+fun <V : MviArgs> optionalArgs() = object : ReadOnlyProperty<Fragment, V?> {
+
+    var value: V? = null
+
+    override fun getValue(thisRef: Fragment, property: KProperty<*>): V? {
+        if (value == null) {
+            val args = thisRef.arguments
+            val argsUntyped = args?.get(Mvi.KEY_ARG)
+            @Suppress("UNCHECKED_CAST")
+            value = argsUntyped as? V
+        }
+        return value
     }
 }
 

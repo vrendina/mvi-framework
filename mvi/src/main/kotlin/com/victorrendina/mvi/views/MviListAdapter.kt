@@ -35,10 +35,14 @@ import io.reactivex.schedulers.Schedulers
  * }
  * ```
  */
-abstract class MviListAdapter<T: Any>(fragment: Fragment) : RecyclerView.Adapter<MviListViewHolder<out T>>() {
+abstract class MviListAdapter<T : Any>(fragment: Fragment) : RecyclerView.Adapter<MviListViewHolder<out T>>() {
 
     protected var data: List<T> = emptyList()
-        private set
+        private set(newList) {
+            val oldList = field
+            field = newList
+            onDataUpdated(oldList, newList)
+        }
 
     /**
      * If the DiffUtil calculations should detect items being moved in the list. If items will never
@@ -174,18 +178,26 @@ abstract class MviListAdapter<T: Any>(fragment: Fragment) : RecyclerView.Adapter
     /**
      * Update the list of data associated with this adapter. This will trigger the differ
      * to check for differences in the data set on a background thread. If the adapter
-     * doesn't have any data then [updateDataImmediate] will be called.
+     * doesn't have any data then notifyItemRangeInserted will be called.
      */
     fun updateData(data: List<T>) {
-        if (itemCount == 0) {
-            updateDataImmediate(data)
-        } else {
-            diffStartTime = System.currentTimeMillis()
-            subscription?.dispose()
-            subscription = calculateDiff(MviDiffRequest(this.data, data))
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(::updateData)
+        when {
+            itemCount == 0 -> updateDataImmediate(data)
+            data.isEmpty() -> {
+                // New data set is empty, notify that all items have been removed
+                val removedItemCount = itemCount
+                this.data = data
+                notifyItemRangeRemoved(0, removedItemCount)
+            }
+            else -> {
+                // Run diffutil on a background thread
+                diffStartTime = System.currentTimeMillis()
+                subscription?.dispose()
+                subscription = calculateDiff(MviDiffRequest(this.data, data))
+                    .subscribeOn(Schedulers.computation())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(::updateData)
+            }
         }
     }
 
@@ -199,6 +211,12 @@ abstract class MviListAdapter<T: Any>(fragment: Fragment) : RecyclerView.Adapter
         if (notify) {
             notifyDataSetChanged()
         }
+    }
+
+    /**
+     * Called when the list of data is updated but before any changes are made to the view.
+     */
+    open fun onDataUpdated(oldList: List<T>, newList: List<T>) {
     }
 
     /**

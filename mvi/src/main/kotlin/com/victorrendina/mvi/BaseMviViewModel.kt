@@ -1,11 +1,11 @@
 package com.victorrendina.mvi
 
 import android.annotation.SuppressLint
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewModel
+import android.util.Log
 import androidx.annotation.CallSuper
 import androidx.annotation.RestrictTo
-import android.util.Log
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModel
 import com.victorrendina.rxqueue2.QueueSubject
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -235,15 +235,6 @@ abstract class BaseMviViewModel<S : MviState, A : MviArgs>(
         subscriber: (P) -> Unit
     ) = selectSubscribeInternal(owner, prop1, subscriber)
 
-    private fun <P> selectSubscribeInternal(
-        owner: LifecycleOwner?,
-        prop1: KProperty1<S, P>,
-        subscriber: (P) -> Unit
-    ) = stateStore.observable
-        .map { MviTuple1(prop1.get(it)) }
-        .distinctUntilChanged()
-        .subscribeLifecycle(owner) { (p) -> subscriber(p) }
-
     private fun <P, V> selectSubscribeInternal(
         owner: LifecycleOwner?,
         prop1: KProperty1<S, P>,
@@ -255,6 +246,15 @@ abstract class BaseMviViewModel<S : MviState, A : MviArgs>(
         .filter { (v) -> v != null }
         .distinctUntilChanged()
         .subscribeLifecycle(owner) { (p) -> subscriber(p!!) }
+
+    private fun <P> selectSubscribeInternal(
+        owner: LifecycleOwner?,
+        prop1: KProperty1<S, P>,
+        subscriber: (P) -> Unit
+    ) = stateStore.observable
+        .map { MviTuple1(prop1.get(it)) }
+        .distinctUntilChanged()
+        .subscribeLifecycle(owner) { (p) -> subscriber(p) }
 
     /**
      * Subscribe to changes in an async property. There are optional parameters for onSuccess
@@ -406,7 +406,7 @@ abstract class BaseMviViewModel<S : MviState, A : MviArgs>(
         subscribe { Log.d(tag, "New State: $it") }
     }
 
-    protected fun Disposable.disposeOnClear(): Disposable {
+    protected fun <T : Disposable> T.disposeOnClear(): T {
         disposables.add(this)
         return this
     }
